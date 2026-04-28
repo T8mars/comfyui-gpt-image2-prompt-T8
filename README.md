@@ -258,10 +258,6 @@ comfyui-gpt-image2-prompt/
 
 ---
 
-## 📄 许可证
-
-MIT 许可证 — 详见 [LICENSE](../LICENSE)。
-
 ## 🙏 致谢
 
 - 提示词集合：[awesome-gpt-image-2-prompts](https://github.com/EvoLinkAI/awesome-gpt-image-2-prompts) by EvoLinkAI
