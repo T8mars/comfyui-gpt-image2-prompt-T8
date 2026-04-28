@@ -1,3 +1,23 @@
+# 网站：[https://ai.t8star.cn](https://ai.t8star.cn/register?aff=cbff0534884)
+# Online workflow overseas：
+https://www.runninghub.ai/?inviteCode=rh-v1121
+# 在线工作流国内版：
+https://www.runninghub.cn/?inviteCode=rh-v1121
+# 👋🏻 Welcome to Zhenzhen
+
+<img src="https://github.com/T8mars/Comfyui-zhenzhen/blob/main/pic/1.png" width="30%" alt="My favorite girl">
+My favorite girl Go YounJung
+
+# 网站价格和宗旨：
+
+本站开设初衷是提供平价的API给粉丝朋友玩最新的海外模型，并非盈利目的，秉承这一理念，我们的价格毛利不到10%，去掉正常缴税和人工开发维护，服务器成本后几乎没有利润，所以并非盈利性质网站，没有任何议价空间，也不支持用于商业目的的二次开发，仅服务于粉丝朋友，望理解，每个月发票数量有限，需要自己承担所有税费5-25%
+
+# 网站使用及Api调用教程：
+
+网站使用教程：https://ai.t8star.cn/about
+
+API调用及开发教程：https://ai.t8star.cn/api-set
+
 # ComfyUI GPT Image 2 Prompts 🎨
 
 一个 ComfyUI 自定义节点包，提供 **300+ 精选 GPT Image 2 提示词**，支持本地图片预览、分类筛选、一键更新和自定义提示词管理。
