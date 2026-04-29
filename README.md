@@ -140,8 +140,8 @@
 
 ```bash
 cd ComfyUI/custom_nodes/
-git clone https://github.com/EvoLinkAI/awesome-gpt-image-2-prompts.git
-cd awesome-gpt-image-2-prompts/comfyui-gpt-image2-prompt/
+git https://github.com/T8mars/comfyui-gpt-image2-prompt-T8
+cd comfyui-gpt-image2-prompt-T8/
 python build_local_prompts.py
 ```
 
@@ -154,7 +154,7 @@ python build_local_prompts.py
 安装完成后，运行数据构建脚本生成本地提示词数据库：
 
 ```bash
-cd ComfyUI/custom_nodes/awesome-gpt-image-2-prompts/comfyui-gpt-image2-prompt/
+cd ComfyUI/custom_nodes/comfyui-gpt-image2-prompt-t8/
 python build_local_prompts.py
 ```
 
@@ -172,7 +172,7 @@ python build_local_prompts.py
 ## 📁 目录结构
 
 ```
-comfyui-gpt-image2-prompt/
+comfyui-gpt-image2-prompt-t8/
 ├── __init__.py              # ComfyUI 入口文件
 ├── nodes.py                 # 5 个节点类定义
 ├── api_routes.py            # HTTP API 路由（图片服务、刷新等）
@@ -191,24 +191,6 @@ comfyui-gpt-image2-prompt/
         ├── custom_prompts.json
         └── *.jpg            # 自定义预览图
 ```
-
----
-
-## 📡 API 接口
-
-插件在 ComfyUI 服务器上注册了以下 HTTP API 接口：
-
-| 接口路径 | 方法 | 说明 |
-|----------|------|------|
-| `/gpt_image2_prompt/prompts` | GET | 获取所有提示词（预设 + 自定义） |
-| `/gpt_image2_prompt/choices_by_category` | GET | 按分类分组的提示词选项 |
-| `/gpt_image2_prompt/refresh_choices` | GET | 获取最新选项和分类（热刷新） |
-| `/gpt_image2_prompt/resolve_selection` | GET | 解析选择字符串为完整提示词数据 |
-| `/gpt_image2_prompt/image?path=...` | GET | 提供本地预览图文件服务 |
-| `/gpt_image2_prompt/categories` | GET | 分类列表及数量统计 |
-| `/gpt_image2_prompt/status` | GET | 插件状态信息 |
-| `/gpt_image2_prompt/delete_custom/{index}` | POST | 删除指定自定义提示词 |
-| `/gpt_image2_prompt/debug_image?path=...` | GET | 调试图片路径解析 |
 
 ---
 
