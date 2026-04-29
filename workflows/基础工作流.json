@@ -1,0 +1,317 @@
+{
+  "id": "5ff7f513-f2c9-4710-bdde-009a96218a9c",
+  "revision": 0,
+  "last_node_id": 34,
+  "last_link_id": 43,
+  "nodes": [
+    {
+      "id": 30,
+      "type": "GPTImage2PromptPreview",
+      "pos": [
+        2186.0103184156146,
+        217.03254840144083
+      ],
+      "size": [
+        871.5994601519055,
+        637.7069214666917
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "image_path",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GPTImage2PromptPreview"
+      },
+      "widgets_values": [
+        "[preset_54] [comparison] Vertical Wuxia Heroine Portrait (@CoderDaMing)",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 31,
+      "type": "GPTImage2PromptSelector",
+      "pos": [
+        3204.046762685973,
+        198.80560816230386
+      ],
+      "size": [
+        867.9340000000002,
+        966.778
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GPTImage2PromptSelector"
+      },
+      "widgets_values": [
+        "all",
+        "[preset_0] [character] Anime Snapshot Conversion (@Thereallo1026)",
+        "Show me the attached image as a snapshot from an actual anime",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 32,
+      "type": "GPTImage2CustomPromptSaver",
+      "pos": [
+        1753.0566247133538,
+        993.6286661107415
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "preview_image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 42
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "STRING",
+          "links": [
+            43
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GPTImage2CustomPromptSaver"
+      },
+      "widgets_values": [
+        "Generate a 16-move choreography sheet in GPT Image\n↓↓↓↓↓↓\nUpload it to Seedance 2.0 as the \"brain\" of your dance\n↓↓↓↓↓↓\nYour character performs the full routine instantly\n↓↓↓↓↓↓\nA complete K-pop dance video. Done in minutes. \n\nGPT Image 2 prompt: A colored pencil sketch style choreography sheet infographic for a K-pop solo dance.\nLayout: 16 steps arranged in a clean 4x4 grid, each panel showing a different dance move.\nSubject: A teenage Asian girl with short blunt-cut hair and bold bangs, wearing a monochrome outfit — fitted black turtleneck, wide-leg tailored trousers, chunky white platform boots, with silver chain accessories and fingerless gloves.\nStyle: Hand-drawn colored pencil illustration, bold outlines with sharp shading, slightly angular and graphic, monochrome base with pops of electric red and silver as accent tones. Confident, editorial energy.\nMovement: Each frame captures sharp, punchy dance motions — arm isolations, sharp head snaps, shoulder locks, chest contractions, low lunges, toe-point poses, dramatic wrist flicks, and a signature ending freeze — with bold red arrows showing force direction and snap timing.\nDesign: High-contrast K-pop girl crush aesthetic, grid with thin black borders, step numbers (1–16) in bold sans-serif, short captions under each frame describing the motion.\nText: Title at the top — \"K-POP GIRL CRUSH – 16 COUNTS – 10 SECONDS – SHARP LOCK & POP\"\nEnvironment: White studio background, dramatic downlight suggestion, minimal clean shadows.\nQuality: High detail, crisp composition, balanced layout, editorial dance tutorial poster.\nNegative prompt: blurry, low quality, extra limbs, distorted anatomy, bad proportions, messy layout, overcrowded design, text errors, watermark, soft or pastel tones.",
+        "kpop dance",
+        "custom"
+      ],
+      "bgcolor": "#3d1a1a"
+    },
+    {
+      "id": 34,
+      "type": "easy showAnything",
+      "pos": [
+        2242.8559765464242,
+        1016.7890466399264
+      ],
+      "size": [
+        140,
+        75.99999999999989
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 43
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "Updated prompt 'kpop dance' (id: custom_1777441085_2). Total custom: 4"
+      ]
+    },
+    {
+      "id": 33,
+      "type": "LoadImage",
+      "pos": [
+        1383.0950382506742,
+        906.9516556674844
+      ],
+      "size": [
+        270,
+        314.0000000000001
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            42
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "839c228c7826155d285486c628870f1f501f1fb33ce43b97bb961f23d5d62533.png",
+        "image"
+      ]
+    },
+    {
+      "id": 28,
+      "type": "easy showAnything",
+      "pos": [
+        1583.0167648844374,
+        425.37468716583976
+      ],
+      "size": [
+        430.93096620352435,
+        261.33065922877563
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 41
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "[Step 1] Checking remote repository...\n  Remote latest: 6ebc85d (2026-04-28T18:06:51Z)\n  Message: feat: add new prompt cases and sync localized updates\n\n[Step 2] Downloading README from GitHub...\n  Parsed 298 cases from remote README\n\n[Step 3] Finding new entries (incremental merge)...\n  New cases to add: 0\n  Already existing: 298\n\n  No new content to add. Everything is up to date.\n\n=== RESULT ===\nTotal: 335 presets (297 with prompt text), 4 custom.\nPresets with local images: 335/335\nNo new entries added (already up to date)."
+      ]
+    },
+    {
+      "id": 27,
+      "type": "GPTImage2PromptUpdater",
+      "pos": [
+        1134.405551983849,
+        387.2813166191336
+      ],
+      "size": [
+        317.4947265625,
+        82
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "STRING",
+          "links": [
+            41
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GPTImage2PromptUpdater"
+      },
+      "widgets_values": [
+        true
+      ],
+      "bgcolor": "#1a3d1a"
+    }
+  ],
+  "links": [
+    [
+      41,
+      27,
+      0,
+      28,
+      0,
+      "STRING"
+    ],
+    [
+      42,
+      33,
+      0,
+      32,
+      0,
+      "IMAGE"
+    ],
+    [
+      43,
+      32,
+      0,
+      34,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "B站、Youtube：T8star-Aix",
+      "bounding": [
+        -80.34036431349105,
+        -352.63922718539186,
+        4168,
+        309
+      ],
+      "color": "#3f789e",
+      "font_size": 240,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.5054470284992982,
+      "offset": [
+        -35.523192609107014,
+        770.4640577443884
+      ]
+    },
+    "frontendVersion": "1.42.10",
+    "VHS_latentpreview": true,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

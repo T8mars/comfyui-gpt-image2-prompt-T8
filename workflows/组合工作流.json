@@ -1,0 +1,2285 @@
+{
+  "id": "d596599d-c616-4b80-bc97-460fe832a3cb",
+  "revision": 0,
+  "last_node_id": 38,
+  "last_link_id": 53,
+  "nodes": [
+    {
+      "id": 5,
+      "type": "easy showAnything",
+      "pos": [
+        1528.4561767578125,
+        787.4033203125
+      ],
+      "size": [
+        308.9223327636719,
+        97.67240905761719
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 31
+        }
+      ],
+      "outputs": [
+        {
+          "label": "output",
+          "name": "output",
+          "type": "*"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "**Comfly gpt-image-2 (official)** async: POST /v1/images/edits?async=true, GET /v1/images/tasks/{task_id}\nModel: gpt-image-2\nPrompt: Generate a 16-move choreography sheet in GPT Image\n↓↓↓↓↓↓\nUpload it to Seedance 2.0 as the \"brain\" of your dance\n↓↓↓↓↓↓\nYour character performs the full routine instantly\n↓↓↓↓↓↓\nA complete K-pop dance video. Done in minutes. \n\nGPT Image 2 prompt: A colored pencil sketch style choreography sheet infographic for a K-pop solo dance.\nLayout: 16 steps arranged in a clean 4x4 grid, each panel showing a different dance move.\nSubject: A teenage Asian girl with short blunt-cut hair and bold bangs, wearing a monochrome outfit — fitted black turtleneck, wide-leg tailored trousers, chunky white platform boots, with silver chain accessories and fingerless gloves.\nStyle: Hand-drawn colored pencil illustration, bold outlines with sharp shading, slightly angular and graphic, monochrome base with pops of electric red and silver as accent tones. Confident, editorial energy.\nMovement: Each frame captures sharp, punchy dance motions — arm isolations, sharp head snaps, shoulder locks, chest contractions, low lunges, toe-point poses, dramatic wrist flicks, and a signature ending freeze — with bold red arrows showing force direction and snap timing.\nDesign: High-contrast K-pop girl crush aesthetic, grid with thin black borders, step numbers (1–16) in bold sans-serif, short captions under each frame describing the motion.\nText: Title at the top — \"K-POP GIRL CRUSH – 16 COUNTS – 10 SECONDS – SHARP LOCK & POP\"\nEnvironment: White studio background, dramatic downlight suggestion, minimal clean shadows.\nQuality: High detail, crisp composition, balanced layout, editorial dance tutorial poster.\nNegative prompt: blurry, low quality, extra limbs, distorted anatomy, bad proportions, messy layout, overcrowded design, text errors, watermark, soft or pastel tones.\nAspect Ratio: 1:1\nResolution: 2k\nActual Size: 2048x2048\nQuality: auto\nInput Images: 1\n（总像素大于约 2560×1440，文档中视为实验性输出）\nOutput: png\nTask ID: 7d7e34bc7af948d292a7116aafc1244a\nImage URL: https://webstatic.aiproxy.vip/output/20260429/9208/f5481b3b-4f81-4f33-b72c-dedcc68c7f0d/08879e88-64c0-4b88-81fa-35b39ba087cc.png\nTotal Tokens: 4634\n"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "easy showAnything",
+      "pos": [
+        1522.786376953125,
+        608.1895751953125
+      ],
+      "size": [
+        337.23248291015625,
+        112.32391357421875
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 30
+        }
+      ],
+      "outputs": [
+        {
+          "label": "output",
+          "name": "output",
+          "type": "*"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "**Comfly gpt-image-2 (official)** async: POST /v1/images/edits?async=true, GET /v1/images/tasks/{task_id}\nModel: gpt-image-2\nPrompt: Generate a 16-move choreography sheet in GPT Image\n↓↓↓↓↓↓\nUpload it to Seedance 2.0 as the \"brain\" of your dance\n↓↓↓↓↓↓\nYour character performs the full routine instantly\n↓↓↓↓↓↓\nA complete K-pop dance video. Done in minutes. \n\nGPT Image 2 prompt: A colored pencil sketch style choreography sheet infographic for a K-pop solo dance.\nLayout: 16 steps arranged in a clean 4x4 grid, each panel showing a different dance move.\nSubject: A teenage Asian girl with short blunt-cut hair and bold bangs, wearing a monochrome outfit — fitted black turtleneck, wide-leg tailored trousers, chunky white platform boots, with silver chain accessories and fingerless gloves.\nStyle: Hand-drawn colored pencil illustration, bold outlines with sharp shading, slightly angular and graphic, monochrome base with pops of electric red and silver as accent tones. Confident, editorial energy.\nMovement: Each frame captures sharp, punchy dance motions — arm isolations, sharp head snaps, shoulder locks, chest contractions, low lunges, toe-point poses, dramatic wrist flicks, and a signature ending freeze — with bold red arrows showing force direction and snap timing.\nDesign: High-contrast K-pop girl crush aesthetic, grid with thin black borders, step numbers (1–16) in bold sans-serif, short captions under each frame describing the motion.\nText: Title at the top — \"K-POP GIRL CRUSH – 16 COUNTS – 10 SECONDS – SHARP LOCK & POP\"\nEnvironment: White studio background, dramatic downlight suggestion, minimal clean shadows.\nQuality: High detail, crisp composition, balanced layout, editorial dance tutorial poster.\nNegative prompt: blurry, low quality, extra limbs, distorted anatomy, bad proportions, messy layout, overcrowded design, text errors, watermark, soft or pastel tones.\nAspect Ratio: 1:1\nResolution: 2k\nActual Size: 2048x2048\nQuality: auto\nInput Images: 1\n（总像素大于约 2560×1440，文档中视为实验性输出）\nOutput: png\nTask ID: 7d7e34bc7af948d292a7116aafc1244a\nImage URL: https://webstatic.aiproxy.vip/output/20260429/9208/f5481b3b-4f81-4f33-b72c-dedcc68c7f0d/08879e88-64c0-4b88-81fa-35b39ba087cc.png\nTotal Tokens: 4634\n"
+      ]
+    },
+    {
+      "id": 16,
+      "type": "easy showAnything",
+      "pos": [
+        3703.0724877085904,
+        639.4502650891521
+      ],
+      "size": [
+        210,
+        95.2576078084611
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 34
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "Saved prompt 'kpop dance' (id: custom_1777441085_2). Total custom: 3"
+      ]
+    },
+    {
+      "id": 18,
+      "type": "easy showAnything",
+      "pos": [
+        1493.2707652546078,
+        2077.2801056881385
+      ],
+      "size": [
+        308.9223327636719,
+        97.67240905761719
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 4,
+      "inputs": [
+        {
+          "label": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "label": "output",
+          "name": "output",
+          "type": "*"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "**Comfly gpt-image-2 (official)** async: POST /v1/images/edits?async=true, GET /v1/images/tasks/{task_id}\nModel: gpt-image-2\nPrompt: Step 1: Generate the storyboard image with GPT Image 2 using the prompt below\n\nCreate a single cinematic storyboard image containing 8 panels, arranged in a 4-column horizontal grid layout across the canvas.\nPanels are evenly distributed in 4 columns, forming a balanced multi-row composition.\nUse generous white space between panels and around the entire layout, creating a calm, refined editorial presentation.\nMinimalist editorial design, white background, precise alignment, consistent spacing, strong grid system.\nSubtle divider lines, ultra-thin, low-contrast, neutral tone, strictly aligned to the grid.\nEach panel is presented as a clean modular card with a clear hierarchy: image frame on top, minimal text block below.\nRefined modern sans-serif typography, light to regular weight, tight typographic control, consistent scale rhythm.\nVisual consistency across all panels: a white flying dragon and a short blond-haired young male wearing a loose flowing white robe riding on its back. A glowing spherical object remains consistent in appearance.\nStyle: live-action cinematic realism, human actor proportions, natural skin detail, physically accurate lighting, real-world materials, high-end film still quality, ultra high resolution, sharp focus.\nCinematic sequence:\nScene 01\nShot type\nWide shot, low-angle tracking\nNarrative\nDragon skims rapidly above ground toward vast geometric ruins, rider standing steadily, bright daylight\nScene 02\nShot type\nWide shot, side view\nNarrative\nDragon enters ruin airspace, stone structures begin sinking and shifting, geometry reconfigures\nScene 03\nShot type\nMedium shot, tracking\nNarrative\nDragon navigates through moving structures forming a spatial maze, rider leans forward, focused\nScene 04\nShot type\nPush-in shot, centered composition\nNarrative\nMassive floating ring appears at center, glowing sphere suspended inside, focal point established\nScene 05\nShot type\nWide-angle, low-angle tracking, high speed\nNarrative\nDragon dives through narrow moving gaps, massive structures pass extremely close, intense speed and compression\nScene 06\nShot type\nClose-up, centered composition\nNarrative\nRider reaches forward to grasp glowing sphere, golden light illuminating face and arm\nScene 07\nShot type\nWide shot, upward motion\nNarrative\nDragon ascends sharply as ruins collapse below, structures sinking and closing, dust fills air\nScene 08\nShot type\nWide shot, high-angle view\nNarrative\nDragon exits above collapsed ruins, open sky, clear silhouette of rider and dragon, resolution moment\nAspect Ratio: 1:1\nResolution: 2k\nActual Size: 2048x2048\nQuality: auto\nInput Images: 1\n（总像素大于约 2560×1440，文档中视为实验性输出）\nOutput: png\nTask ID: ff55e6d505f346c9b2db5a1b0be78a41\nImage URL: https://webstatic.aiproxy.vip/output/20260429/9208/f087b64d-6610-460c-93b2-876983ccfc17/5b1c3639-4d79-40fa-855b-d2e898d8a600.png\nTotal Tokens: 6182\n"
+      ]
+    },
+    {
+      "id": 19,
+      "type": "easy showAnything",
+      "pos": [
+        1487.6009654499203,
+        1898.066360570951
+      ],
+      "size": [
+        337.23248291015625,
+        112.32391357421875
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 4,
+      "inputs": [
+        {
+          "label": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 36
+        }
+      ],
+      "outputs": [
+        {
+          "label": "output",
+          "name": "output",
+          "type": "*"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "**Comfly gpt-image-2 (official)** async: POST /v1/images/edits?async=true, GET /v1/images/tasks/{task_id}\nModel: gpt-image-2\nPrompt: Step 1: Generate the storyboard image with GPT Image 2 using the prompt below\n\nCreate a single cinematic storyboard image containing 8 panels, arranged in a 4-column horizontal grid layout across the canvas.\nPanels are evenly distributed in 4 columns, forming a balanced multi-row composition.\nUse generous white space between panels and around the entire layout, creating a calm, refined editorial presentation.\nMinimalist editorial design, white background, precise alignment, consistent spacing, strong grid system.\nSubtle divider lines, ultra-thin, low-contrast, neutral tone, strictly aligned to the grid.\nEach panel is presented as a clean modular card with a clear hierarchy: image frame on top, minimal text block below.\nRefined modern sans-serif typography, light to regular weight, tight typographic control, consistent scale rhythm.\nVisual consistency across all panels: a white flying dragon and a short blond-haired young male wearing a loose flowing white robe riding on its back. A glowing spherical object remains consistent in appearance.\nStyle: live-action cinematic realism, human actor proportions, natural skin detail, physically accurate lighting, real-world materials, high-end film still quality, ultra high resolution, sharp focus.\nCinematic sequence:\nScene 01\nShot type\nWide shot, low-angle tracking\nNarrative\nDragon skims rapidly above ground toward vast geometric ruins, rider standing steadily, bright daylight\nScene 02\nShot type\nWide shot, side view\nNarrative\nDragon enters ruin airspace, stone structures begin sinking and shifting, geometry reconfigures\nScene 03\nShot type\nMedium shot, tracking\nNarrative\nDragon navigates through moving structures forming a spatial maze, rider leans forward, focused\nScene 04\nShot type\nPush-in shot, centered composition\nNarrative\nMassive floating ring appears at center, glowing sphere suspended inside, focal point established\nScene 05\nShot type\nWide-angle, low-angle tracking, high speed\nNarrative\nDragon dives through narrow moving gaps, massive structures pass extremely close, intense speed and compression\nScene 06\nShot type\nClose-up, centered composition\nNarrative\nRider reaches forward to grasp glowing sphere, golden light illuminating face and arm\nScene 07\nShot type\nWide shot, upward motion\nNarrative\nDragon ascends sharply as ruins collapse below, structures sinking and closing, dust fills air\nScene 08\nShot type\nWide shot, high-angle view\nNarrative\nDragon exits above collapsed ruins, open sky, clear silhouette of rider and dragon, resolution moment\nAspect Ratio: 1:1\nResolution: 2k\nActual Size: 2048x2048\nQuality: auto\nInput Images: 1\n（总像素大于约 2560×1440，文档中视为实验性输出）\nOutput: png\nTask ID: ff55e6d505f346c9b2db5a1b0be78a41\nImage URL: https://webstatic.aiproxy.vip/output/20260429/9208/f087b64d-6610-460c-93b2-876983ccfc17/5b1c3639-4d79-40fa-855b-d2e898d8a600.png\nTotal Tokens: 6182\n"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "LoadImage",
+      "pos": [
+        361.5361506079619,
+        1765.7458368461973
+      ],
+      "size": [
+        274.080078125,
+        314.0000305175781
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 4,
+      "inputs": [
+        {
+          "label": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "label": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            38
+          ]
+        },
+        {
+          "label": "MASK",
+          "name": "MASK",
+          "type": "MASK"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "未标题-1.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 26,
+      "type": "easy showAnything",
+      "pos": [
+        3784.227184734997,
+        1766.6068016247605
+      ],
+      "size": [
+        210,
+        95.2576078084611
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 41
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "Saved prompt 'dragon fly' (id: custom_1777442141_3). Total custom: 4"
+      ]
+    },
+    {
+      "id": 23,
+      "type": "Comfly_gpt_image_2_official_ratio",
+      "pos": [
+        975.1701182819514,
+        1683.7868805904823
+      ],
+      "size": [
+        400,
+        864
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 4,
+      "inputs": [
+        {
+          "label": "image1",
+          "name": "image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 38
+        },
+        {
+          "label": "image2",
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image3",
+          "name": "image3",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image4",
+          "name": "image4",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image5",
+          "name": "image5",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image6",
+          "name": "image6",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image7",
+          "name": "image7",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image8",
+          "name": "image8",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image9",
+          "name": "image9",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image10",
+          "name": "image10",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image11",
+          "name": "image11",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image12",
+          "name": "image12",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image13",
+          "name": "image13",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image14",
+          "name": "image14",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image15",
+          "name": "image15",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "image16",
+          "name": "image16",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "mask",
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        },
+        {
+          "label": "prompt",
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": null
+        },
+        {
+          "label": "aspect_ratio",
+          "name": "aspect_ratio",
+          "type": "COMBO",
+          "widget": {
+            "name": "aspect_ratio"
+          },
+          "link": null
+        },
+        {
+          "label": "resolution",
+          "name": "resolution",
+          "type": "COMBO",
+          "widget": {
+            "name": "resolution"
+          },
+          "link": null
+        },
+        {
+          "label": "api_key",
+          "name": "api_key",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 39
+        },
+        {
+          "label": "n",
+          "name": "n",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "n"
+          },
+          "link": null
+        },
+        {
+          "label": "quality",
+          "name": "quality",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "quality"
+          },
+          "link": null
+        },
+        {
+          "label": "background",
+          "name": "background",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "background"
+          },
+          "link": null
+        },
+        {
+          "label": "output_format",
+          "name": "output_format",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "output_format"
+          },
+          "link": null
+        },
+        {
+          "label": "output_compression",
+          "name": "output_compression",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "output_compression"
+          },
+          "link": null
+        },
+        {
+          "label": "moderation",
+          "name": "moderation",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "moderation"
+          },
+          "link": null
+        },
+        {
+          "label": "async_mode",
+          "name": "async_mode",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "async_mode"
+          },
+          "link": null
+        },
+        {
+          "label": "webhook",
+          "name": "webhook",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "webhook"
+          },
+          "link": null
+        },
+        {
+          "label": "max_poll_attempts",
+          "name": "max_poll_attempts",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "max_poll_attempts"
+          },
+          "link": null
+        },
+        {
+          "label": "poll_interval",
+          "name": "poll_interval",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "poll_interval"
+          },
+          "link": null
+        },
+        {
+          "label": "max_retries",
+          "name": "max_retries",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "max_retries"
+          },
+          "link": null
+        },
+        {
+          "label": "initial_timeout",
+          "name": "initial_timeout",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "initial_timeout"
+          },
+          "link": null
+        },
+        {
+          "label": "seed",
+          "name": "seed",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "label": "skip_error",
+          "name": "skip_error",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "skip_error"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            37
+          ]
+        },
+        {
+          "label": "image_url",
+          "name": "image_url",
+          "type": "STRING"
+        },
+        {
+          "label": "response",
+          "name": "response",
+          "type": "STRING",
+          "links": [
+            35,
+            36
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Comfly_gpt_image_2_official_ratio",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "Step 1: Generate the storyboard image with GPT Image 2 using the prompt below\n\nCreate a single cinematic storyboard image containing 8 panels, arranged in a 4-column horizontal grid layout across the canvas.\nPanels are evenly distributed in 4 columns, forming a balanced multi-row composition.\nUse generous white space between panels and around the entire layout, creating a calm, refined editorial presentation.\nMinimalist editorial design, white background, precise alignment, consistent spacing, strong grid system.\nSubtle divider lines, ultra-thin, low-contrast, neutral tone, strictly aligned to the grid.\nEach panel is presented as a clean modular card with a clear hierarchy: image frame on top, minimal text block below.\nRefined modern sans-serif typography, light to regular weight, tight typographic control, consistent scale rhythm.\nVisual consistency across all panels: a white flying dragon and a short blond-haired young male wearing a loose flowing white robe riding on its back. A glowing spherical object remains consistent in appearance.\nStyle: live-action cinematic realism, human actor proportions, natural skin detail, physically accurate lighting, real-world materials, high-end film still quality, ultra high resolution, sharp focus.\nCinematic sequence:\nScene 01\nShot type\nWide shot, low-angle tracking\nNarrative\nDragon skims rapidly above ground toward vast geometric ruins, rider standing steadily, bright daylight\nScene 02\nShot type\nWide shot, side view\nNarrative\nDragon enters ruin airspace, stone structures begin sinking and shifting, geometry reconfigures\nScene 03\nShot type\nMedium shot, tracking\nNarrative\nDragon navigates through moving structures forming a spatial maze, rider leans forward, focused\nScene 04\nShot type\nPush-in shot, centered composition\nNarrative\nMassive floating ring appears at center, glowing sphere suspended inside, focal point established\nScene 05\nShot type\nWide-angle, low-angle tracking, high speed\nNarrative\nDragon dives through narrow moving gaps, massive structures pass extremely close, intense speed and compression\nScene 06\nShot type\nClose-up, centered composition\nNarrative\nRider reaches forward to grasp glowing sphere, golden light illuminating face and arm\nScene 07\nShot type\nWide shot, upward motion\nNarrative\nDragon ascends sharply as ruins collapse below, structures sinking and closing, dust fills air\nScene 08\nShot type\nWide shot, high-angle view\nNarrative\nDragon exits above collapsed ruins, open sky, clear silhouette of rider and dragon, resolution moment",
+        "1:1",
+        "2k",
+        "",
+        1,
+        "auto",
+        "auto",
+        "png",
+        100,
+        "auto",
+        true,
+        "",
+        300,
+        5,
+        5,
+        900,
+        1072763579670758,
+        "randomize",
+        "url",
+        false
+      ]
+    },
+    {
+      "id": 25,
+      "type": "GPTImage2CustomPromptSaver",
+      "pos": [
+        3320.4027338329824,
+        1790.0956307857066
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "preview_image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 40
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "STRING",
+          "links": [
+            41
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GPTImage2CustomPromptSaver"
+      },
+      "widgets_values": [
+        "Step 1: Generate the storyboard image with GPT Image 2 using the prompt below\n\nCreate a single cinematic storyboard image containing 8 panels, arranged in a 4-column horizontal grid layout across the canvas.\nPanels are evenly distributed in 4 columns, forming a balanced multi-row composition.\nUse generous white space between panels and around the entire layout, creating a calm, refined editorial presentation.\nMinimalist editorial design, white background, precise alignment, consistent spacing, strong grid system.\nSubtle divider lines, ultra-thin, low-contrast, neutral tone, strictly aligned to the grid.\nEach panel is presented as a clean modular card with a clear hierarchy: image frame on top, minimal text block below.\nRefined modern sans-serif typography, light to regular weight, tight typographic control, consistent scale rhythm.\nVisual consistency across all panels: a white flying dragon and a short blond-haired young male wearing a loose flowing white robe riding on its back. A glowing spherical object remains consistent in appearance.\nStyle: live-action cinematic realism, human actor proportions, natural skin detail, physically accurate lighting, real-world materials, high-end film still quality, ultra high resolution, sharp focus.\nCinematic sequence:\nScene 01\nShot type\nWide shot, low-angle tracking\nNarrative\nDragon skims rapidly above ground toward vast geometric ruins, rider standing steadily, bright daylight\nScene 02\nShot type\nWide shot, side view\nNarrative\nDragon enters ruin airspace, stone structures begin sinking and shifting, geometry reconfigures\nScene 03\nShot type\nMedium shot, tracking\nNarrative\nDragon navigates through moving structures forming a spatial maze, rider leans forward, focused\nScene 04\nShot type\nPush-in shot, centered composition\nNarrative\nMassive floating ring appears at center, glowing sphere suspended inside, focal point established\nScene 05\nShot type\nWide-angle, low-angle tracking, high speed\nNarrative\nDragon dives through narrow moving gaps, massive structures pass extremely close, intense speed and compression\nScene 06\nShot type\nClose-up, centered composition\nNarrative\nRider reaches forward to grasp glowing sphere, golden light illuminating face and arm\nScene 07\nShot type\nWide shot, upward motion\nNarrative\nDragon ascends sharply as ruins collapse below, structures sinking and closing, dust fills air\nScene 08\nShot type\nWide shot, high-angle view\nNarrative\nDragon exits above collapsed ruins, open sky, clear silhouette of rider and dragon, resolution moment",
+        "dragon fly",
+        "custom"
+      ],
+      "bgcolor": "#1a3d1a"
+    },
+    {
+      "id": 27,
+      "type": "GPTImage2PromptSelector",
+      "pos": [
+        4084.7613214600187,
+        1610.2130593650397
+      ],
+      "size": [
+        450,
+        650
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GPTImage2PromptSelector"
+      },
+      "widgets_values": [
+        "all",
+        "[custom_3] dragon fly",
+        "Step 1: Generate the storyboard image with GPT Image 2 using the prompt below\n\nCreate a single cinematic storyboard image containing 8 panels, arranged in a 4-column horizontal grid layout across the canvas.\nPanels are evenly distributed in 4 columns, forming a balanced multi-row composition.\nUse generous white space between panels and around the entire layout, creating a calm, refined editorial presentation.\nMinimalist editorial design, white background, precise alignment, consistent spacing, strong grid system.\nSubtle divider lines, ultra-thin, low-contrast, neutral tone, strictly aligned to the grid.\nEach panel is presented as a clean modular card with a clear hierarchy: image frame on top, minimal text block below.\nRefined modern sans-serif typography, light to regular weight, tight typographic control, consistent scale rhythm.\nVisual consistency across all panels: a white flying dragon and a short blond-haired young male wearing a loose flowing white robe riding on its back. A glowing spherical object remains consistent in appearance.\nStyle: live-action cinematic realism, human actor proportions, natural skin detail, physically accurate lighting, real-world materials, high-end film still quality, ultra high resolution, sharp focus.\nCinematic sequence:\nScene 01\nShot type\nWide shot, low-angle tracking\nNarrative\nDragon skims rapidly above ground toward vast geometric ruins, rider standing steadily, bright daylight\nScene 02\nShot type\nWide shot, side view\nNarrative\nDragon enters ruin airspace, stone structures begin sinking and shifting, geometry reconfigures\nScene 03\nShot type\nMedium shot, tracking\nNarrative\nDragon navigates through moving structures forming a spatial maze, rider leans forward, focused\nScene 04\nShot type\nPush-in shot, centered composition\nNarrative\nMassive floating ring appears at center, glowing sphere suspended inside, focal point established\nScene 05\nShot type\nWide-angle, low-angle tracking, high speed\nNarrative\nDragon dives through narrow moving gaps, massive structures pass extremely close, intense speed and compression\nScene 06\nShot type\nClose-up, centered composition\nNarrative\nRider reaches forward to grasp glowing sphere, golden light illuminating face and arm\nScene 07\nShot type\nWide shot, upward motion\nNarrative\nDragon ascends sharply as ruins collapse below, structures sinking and closing, dust fills air\nScene 08\nShot type\nWide shot, high-angle view\nNarrative\nDragon exits above collapsed ruins, open sky, clear silhouette of rider and dragon, resolution moment",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 22,
+      "type": "SaveImage",
+      "pos": [
+        1942.5812740772296,
+        1609.0299635583738
+      ],
+      "size": [
+        725.853271484375,
+        624.9677734375
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 4,
+      "inputs": [
+        {
+          "label": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 37
+        },
+        {
+          "label": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "image_urls",
+          "name": "image_urls",
+          "type": "STRING"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "Comfly_gpt_image_2_official_ratio",
+      "pos": [
+        1010.3555297851562,
+        393.91009521484375
+      ],
+      "size": [
+        400,
+        864
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "image1",
+          "name": "image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 32
+        },
+        {
+          "label": "image2",
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image3",
+          "name": "image3",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image4",
+          "name": "image4",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image5",
+          "name": "image5",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image6",
+          "name": "image6",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image7",
+          "name": "image7",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image8",
+          "name": "image8",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image9",
+          "name": "image9",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image10",
+          "name": "image10",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image11",
+          "name": "image11",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image12",
+          "name": "image12",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image13",
+          "name": "image13",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image14",
+          "name": "image14",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image15",
+          "name": "image15",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "image16",
+          "name": "image16",
+          "shape": 7,
+          "type": "IMAGE"
+        },
+        {
+          "label": "mask",
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK"
+        },
+        {
+          "label": "prompt",
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": null
+        },
+        {
+          "label": "aspect_ratio",
+          "name": "aspect_ratio",
+          "type": "COMBO",
+          "widget": {
+            "name": "aspect_ratio"
+          }
+        },
+        {
+          "label": "resolution",
+          "name": "resolution",
+          "type": "COMBO",
+          "widget": {
+            "name": "resolution"
+          }
+        },
+        {
+          "label": "api_key",
+          "name": "api_key",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 28
+        },
+        {
+          "label": "n",
+          "name": "n",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "n"
+          }
+        },
+        {
+          "label": "quality",
+          "name": "quality",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "quality"
+          }
+        },
+        {
+          "label": "background",
+          "name": "background",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "background"
+          }
+        },
+        {
+          "label": "output_format",
+          "name": "output_format",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "output_format"
+          }
+        },
+        {
+          "label": "output_compression",
+          "name": "output_compression",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "output_compression"
+          }
+        },
+        {
+          "label": "moderation",
+          "name": "moderation",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "moderation"
+          }
+        },
+        {
+          "label": "async_mode",
+          "name": "async_mode",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "async_mode"
+          }
+        },
+        {
+          "label": "webhook",
+          "name": "webhook",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "webhook"
+          }
+        },
+        {
+          "label": "max_poll_attempts",
+          "name": "max_poll_attempts",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "max_poll_attempts"
+          }
+        },
+        {
+          "label": "poll_interval",
+          "name": "poll_interval",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "poll_interval"
+          }
+        },
+        {
+          "label": "max_retries",
+          "name": "max_retries",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "max_retries"
+          }
+        },
+        {
+          "label": "initial_timeout",
+          "name": "initial_timeout",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "initial_timeout"
+          }
+        },
+        {
+          "label": "seed",
+          "name": "seed",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "label": "skip_error",
+          "name": "skip_error",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "skip_error"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "label": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            29
+          ]
+        },
+        {
+          "label": "image_url",
+          "name": "image_url",
+          "type": "STRING"
+        },
+        {
+          "label": "response",
+          "name": "response",
+          "type": "STRING",
+          "links": [
+            30,
+            31
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Comfly_gpt_image_2_official_ratio",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "Generate a 16-move choreography sheet in GPT Image\n↓↓↓↓↓↓\nUpload it to Seedance 2.0 as the \"brain\" of your dance\n↓↓↓↓↓↓\nYour character performs the full routine instantly\n↓↓↓↓↓↓\nA complete K-pop dance video. Done in minutes. \n\nGPT Image 2 prompt: A colored pencil sketch style choreography sheet infographic for a K-pop solo dance.\nLayout: 16 steps arranged in a clean 4x4 grid, each panel showing a different dance move.\nSubject: A teenage Asian girl with short blunt-cut hair and bold bangs, wearing a monochrome outfit — fitted black turtleneck, wide-leg tailored trousers, chunky white platform boots, with silver chain accessories and fingerless gloves.\nStyle: Hand-drawn colored pencil illustration, bold outlines with sharp shading, slightly angular and graphic, monochrome base with pops of electric red and silver as accent tones. Confident, editorial energy.\nMovement: Each frame captures sharp, punchy dance motions — arm isolations, sharp head snaps, shoulder locks, chest contractions, low lunges, toe-point poses, dramatic wrist flicks, and a signature ending freeze — with bold red arrows showing force direction and snap timing.\nDesign: High-contrast K-pop girl crush aesthetic, grid with thin black borders, step numbers (1–16) in bold sans-serif, short captions under each frame describing the motion.\nText: Title at the top — \"K-POP GIRL CRUSH – 16 COUNTS – 10 SECONDS – SHARP LOCK & POP\"\nEnvironment: White studio background, dramatic downlight suggestion, minimal clean shadows.\nQuality: High detail, crisp composition, balanced layout, editorial dance tutorial poster.\nNegative prompt: blurry, low quality, extra limbs, distorted anatomy, bad proportions, messy layout, overcrowded design, text errors, watermark, soft or pastel tones.",
+        "1:1",
+        "2k",
+        "",
+        1,
+        "auto",
+        "auto",
+        "png",
+        100,
+        "auto",
+        true,
+        "",
+        300,
+        5,
+        5,
+        900,
+        175668544252196,
+        "randomize",
+        "url",
+        false
+      ]
+    },
+    {
+      "id": 29,
+      "type": "LoadImage",
+      "pos": [
+        4805.446937400018,
+        362.8690161154527
+      ],
+      "size": [
+        274.080078125,
+        314.0000305175781
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "label": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            43
+          ]
+        },
+        {
+          "label": "MASK",
+          "name": "MASK",
+          "type": "MASK"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "未标题-1.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 33,
+      "type": "LoadImage",
+      "pos": [
+        4885.108304095267,
+        1653.2509341402256
+      ],
+      "size": [
+        274.080078125,
+        314.0000305175781
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 4,
+      "inputs": [
+        {
+          "label": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "label": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            46
+          ]
+        },
+        {
+          "label": "MASK",
+          "name": "MASK",
+          "type": "MASK"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "未标题-1.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 24,
+      "type": "LoadImage",
+      "pos": [
+        2950.6504667137015,
+        1719.4544405215292
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            40
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "ComfyUI_00276_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 36,
+      "type": "LoadImage",
+      "pos": [
+        4897.8191143815075,
+        2063.372241309925
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            49
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "ComfyUI_00276_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 32,
+      "type": "Comfly_Doubao_Seedance2_0",
+      "pos": [
+        5458.823606490537,
+        1693.7844427881228
+      ],
+      "size": [
+        400,
+        750
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "first_frame",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "last_frame",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 46
+        },
+        {
+          "name": "ref_image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 49
+        },
+        {
+          "name": "ref_image3",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image4",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image5",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image6",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image7",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image8",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image9",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "video1",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "video2",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "video3",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "audio1",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "audio2",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "audio3",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            52
+          ]
+        },
+        {
+          "name": "task_id",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "response",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "video_url",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "last_frame_image",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Comfly_Doubao_Seedance2_0"
+      },
+      "widgets_values": [
+        "人物换成image1的女人，电影动作参考@image2的分镜，生成一段音画同步，顶级奥斯卡大奖级的电影片段",
+        "doubao-seedance-2-0-260128",
+        15,
+        "16:9",
+        "720p",
+        "",
+        true,
+        false,
+        false,
+        false,
+        1836176247,
+        "randomize",
+        "",
+        false
+      ]
+    },
+    {
+      "id": 31,
+      "type": "SaveVideo",
+      "pos": [
+        6234.143323981661,
+        438.0408184890314
+      ],
+      "size": [
+        1158.1056499512615,
+        752.8839910034689
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 53
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveVideo"
+      },
+      "widgets_values": [
+        "video/ComfyUI",
+        "auto",
+        "auto"
+      ]
+    },
+    {
+      "id": 34,
+      "type": "SaveVideo",
+      "pos": [
+        6261.255676264701,
+        1741.21901040968
+      ],
+      "size": [
+        1443.7373737373546,
+        1102.4002525252386
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 52
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveVideo"
+      },
+      "widgets_values": [
+        "video/ComfyUI",
+        "auto",
+        "auto"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "LoadImage",
+      "pos": [
+        355.32680724055723,
+        454.5444807796388
+      ],
+      "size": [
+        274.080078125,
+        314.0000305175781
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          }
+        },
+        {
+          "label": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "label": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            32
+          ]
+        },
+        {
+          "label": "MASK",
+          "name": "MASK",
+          "type": "MASK"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "未标题-1.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 1,
+      "type": "SaveImage",
+      "pos": [
+        1976.6095887108588,
+        447.4154234677603
+      ],
+      "size": [
+        725.853271484375,
+        624.9677734375
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 29
+        },
+        {
+          "label": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "label": "image_urls",
+          "name": "image_urls",
+          "type": "STRING"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 15,
+      "type": "LoadImage",
+      "pos": [
+        2869.495769687295,
+        592.2979039859208
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            33
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "ComfyUI_00275_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 14,
+      "type": "GPTImage2CustomPromptSaver",
+      "pos": [
+        3239.248036806576,
+        662.9390942500982
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "preview_image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 33
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "STRING",
+          "links": [
+            34
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GPTImage2CustomPromptSaver"
+      },
+      "widgets_values": [
+        "Generate a 16-move choreography sheet in GPT Image\n↓↓↓↓↓↓\nUpload it to Seedance 2.0 as the \"brain\" of your dance\n↓↓↓↓↓↓\nYour character performs the full routine instantly\n↓↓↓↓↓↓\nA complete K-pop dance video. Done in minutes. \n\nGPT Image 2 prompt: A colored pencil sketch style choreography sheet infographic for a K-pop solo dance.\nLayout: 16 steps arranged in a clean 4x4 grid, each panel showing a different dance move.\nSubject: A teenage Asian girl with short blunt-cut hair and bold bangs, wearing a monochrome outfit — fitted black turtleneck, wide-leg tailored trousers, chunky white platform boots, with silver chain accessories and fingerless gloves.\nStyle: Hand-drawn colored pencil illustration, bold outlines with sharp shading, slightly angular and graphic, monochrome base with pops of electric red and silver as accent tones. Confident, editorial energy.\nMovement: Each frame captures sharp, punchy dance motions — arm isolations, sharp head snaps, shoulder locks, chest contractions, low lunges, toe-point poses, dramatic wrist flicks, and a signature ending freeze — with bold red arrows showing force direction and snap timing.\nDesign: High-contrast K-pop girl crush aesthetic, grid with thin black borders, step numbers (1–16) in bold sans-serif, short captions under each frame describing the motion.\nText: Title at the top — \"K-POP GIRL CRUSH – 16 COUNTS – 10 SECONDS – SHARP LOCK & POP\"\nEnvironment: White studio background, dramatic downlight suggestion, minimal clean shadows.\nQuality: High detail, crisp composition, balanced layout, editorial dance tutorial poster.\nNegative prompt: blurry, low quality, extra limbs, distorted anatomy, bad proportions, messy layout, overcrowded design, text errors, watermark, soft or pastel tones.",
+        "kpop dance",
+        "custom"
+      ],
+      "bgcolor": "#1a3d1a"
+    },
+    {
+      "id": 17,
+      "type": "GPTImage2PromptSelector",
+      "pos": [
+        4012.655830064253,
+        482.199913917743
+      ],
+      "size": [
+        450,
+        650
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GPTImage2PromptSelector"
+      },
+      "widgets_values": [
+        "all",
+        "[custom_2] kpop dance",
+        "Generate a 16-move choreography sheet in GPT Image\n↓↓↓↓↓↓\nUpload it to Seedance 2.0 as the \"brain\" of your dance\n↓↓↓↓↓↓\nYour character performs the full routine instantly\n↓↓↓↓↓↓\nA complete K-pop dance video. Done in minutes. \n\nGPT Image 2 prompt: A colored pencil sketch style choreography sheet infographic for a K-pop solo dance.\nLayout: 16 steps arranged in a clean 4x4 grid, each panel showing a different dance move.\nSubject: A teenage Asian girl with short blunt-cut hair and bold bangs, wearing a monochrome outfit — fitted black turtleneck, wide-leg tailored trousers, chunky white platform boots, with silver chain accessories and fingerless gloves.\nStyle: Hand-drawn colored pencil illustration, bold outlines with sharp shading, slightly angular and graphic, monochrome base with pops of electric red and silver as accent tones. Confident, editorial energy.\nMovement: Each frame captures sharp, punchy dance motions — arm isolations, sharp head snaps, shoulder locks, chest contractions, low lunges, toe-point poses, dramatic wrist flicks, and a signature ending freeze — with bold red arrows showing force direction and snap timing.\nDesign: High-contrast K-pop girl crush aesthetic, grid with thin black borders, step numbers (1–16) in bold sans-serif, short captions under each frame describing the motion.\nText: Title at the top — \"K-POP GIRL CRUSH – 16 COUNTS – 10 SECONDS – SHARP LOCK & POP\"\nEnvironment: White studio background, dramatic downlight suggestion, minimal clean shadows.\nQuality: High detail, crisp composition, balanced layout, editorial dance tutorial poster.\nNegative prompt: blurry, low quality, extra limbs, distorted anatomy, bad proportions, messy layout, overcrowded design, text errors, watermark, soft or pastel tones.",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 28,
+      "type": "Comfly_Doubao_Seedance2_0",
+      "pos": [
+        5390.4517183963635,
+        436.01657405534513
+      ],
+      "size": [
+        400,
+        750
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "first_frame",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "last_frame",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 43
+        },
+        {
+          "name": "ref_image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 44
+        },
+        {
+          "name": "ref_image3",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image4",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image5",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image6",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image7",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image8",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_image9",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "video1",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "video2",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "video3",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "audio1",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "audio2",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "audio3",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            53
+          ]
+        },
+        {
+          "name": "task_id",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "response",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "video_url",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "last_frame_image",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Comfly_Doubao_Seedance2_0"
+      },
+      "widgets_values": [
+        "人脸参考@image1，舞蹈动作参考@image2的分镜，生成一段音画同步，顶级KPOP舞蹈MV视频",
+        "doubao-seedance-2-0-260128",
+        15,
+        "16:9",
+        "720p",
+        "",
+        true,
+        false,
+        false,
+        false,
+        1164966232,
+        "randomize",
+        "",
+        false
+      ]
+    },
+    {
+      "id": 30,
+      "type": "LoadImage",
+      "pos": [
+        4818.648557430446,
+        765.0467049919422
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            44
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "ComfyUI_00275_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "Comfly_api_set",
+      "pos": [
+        348.1402330497328,
+        890.8899770826982
+      ],
+      "size": [
+        270,
+        130
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "api_base",
+          "name": "api_base",
+          "type": "COMBO",
+          "widget": {
+            "name": "api_base"
+          }
+        },
+        {
+          "label": "apikey",
+          "name": "apikey",
+          "type": "STRING",
+          "widget": {
+            "name": "apikey"
+          }
+        },
+        {
+          "label": "custom_ip",
+          "name": "custom_ip",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "custom_ip"
+          }
+        },
+        {
+          "label": "skip_error",
+          "name": "skip_error",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "skip_error"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "label": "apikey",
+          "name": "apikey",
+          "type": "STRING",
+          "links": [
+            28
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Comfly_api_set",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "zhenzhen",
+        "",
+        "",
+        false
+      ]
+    },
+    {
+      "id": 20,
+      "type": "Comfly_api_set",
+      "pos": [
+        424.1626414753108,
+        2173.227249242826
+      ],
+      "size": [
+        270,
+        130
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 4,
+      "inputs": [
+        {
+          "label": "api_base",
+          "name": "api_base",
+          "type": "COMBO",
+          "widget": {
+            "name": "api_base"
+          },
+          "link": null
+        },
+        {
+          "label": "apikey",
+          "name": "apikey",
+          "type": "STRING",
+          "widget": {
+            "name": "apikey"
+          },
+          "link": null
+        },
+        {
+          "label": "custom_ip",
+          "name": "custom_ip",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "custom_ip"
+          },
+          "link": null
+        },
+        {
+          "label": "skip_error",
+          "name": "skip_error",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "skip_error"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "apikey",
+          "name": "apikey",
+          "type": "STRING",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Comfly_api_set",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "zhenzhen",
+        "",
+        "",
+        false
+      ]
+    }
+  ],
+  "links": [
+    [
+      28,
+      4,
+      0,
+      13,
+      20,
+      "STRING"
+    ],
+    [
+      29,
+      13,
+      0,
+      1,
+      0,
+      "IMAGE"
+    ],
+    [
+      30,
+      13,
+      2,
+      2,
+      0,
+      "*"
+    ],
+    [
+      31,
+      13,
+      2,
+      5,
+      0,
+      "*"
+    ],
+    [
+      32,
+      8,
+      0,
+      13,
+      0,
+      "IMAGE"
+    ],
+    [
+      33,
+      15,
+      0,
+      14,
+      0,
+      "IMAGE"
+    ],
+    [
+      34,
+      14,
+      0,
+      16,
+      0,
+      "STRING"
+    ],
+    [
+      35,
+      23,
+      2,
+      18,
+      0,
+      "STRING"
+    ],
+    [
+      36,
+      23,
+      2,
+      19,
+      0,
+      "STRING"
+    ],
+    [
+      37,
+      23,
+      0,
+      22,
+      0,
+      "IMAGE"
+    ],
+    [
+      38,
+      21,
+      0,
+      23,
+      0,
+      "IMAGE"
+    ],
+    [
+      39,
+      20,
+      0,
+      23,
+      20,
+      "STRING"
+    ],
+    [
+      40,
+      24,
+      0,
+      25,
+      0,
+      "IMAGE"
+    ],
+    [
+      41,
+      25,
+      0,
+      26,
+      0,
+      "STRING"
+    ],
+    [
+      43,
+      29,
+      0,
+      28,
+      2,
+      "IMAGE"
+    ],
+    [
+      44,
+      30,
+      0,
+      28,
+      3,
+      "IMAGE"
+    ],
+    [
+      46,
+      33,
+      0,
+      32,
+      2,
+      "IMAGE"
+    ],
+    [
+      49,
+      36,
+      0,
+      32,
+      3,
+      "IMAGE"
+    ],
+    [
+      52,
+      32,
+      0,
+      34,
+      0,
+      "VIDEO"
+    ],
+    [
+      53,
+      28,
+      0,
+      31,
+      0,
+      "VIDEO"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 2,
+      "title": "B站，Youtube：T8star-Aix",
+      "bounding": [
+        -358.0143127441406,
+        -237.22854614257812,
+        2836.38525390625,
+        427.2743835449219
+      ],
+      "color": "#3f789e",
+      "font_size": 240,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "links_added_by_ue": [],
+    "VHS_KeepIntermediate": true,
+    "ue_links": [],
+    "VHS_MetadataImage": true,
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "VHS_latentpreviewrate": 0,
+    "frontendVersion": "1.42.10",
+    "VHS_latentpreview": false,
+    "ds": {
+      "scale": 0.3719008264462893,
+      "offset": [
+        -446.9816266424978,
+        151.06443134092086
+      ]
+    }
+  },
+  "version": 0.4
+}
