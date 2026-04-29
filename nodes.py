@@ -231,7 +231,8 @@ class GPTImage2PromptSelector:
 # Node: GPT Image 2 Prompt Updater
 # ============================================================
 class GPTImage2PromptUpdater:
-    """Update prompts by re-parsing the README or pulling from GitHub."""
+    """Sync prompts from the remote GitHub repository (EvoLinkAI/awesome-gpt-image-2-prompts).
+    INCREMENTAL: Only adds new entries, NEVER removes existing ones."""
 
     CATEGORY = "GPT Image 2 Prompts"
     FUNCTION = "update_prompts"
@@ -239,88 +240,281 @@ class GPTImage2PromptUpdater:
     RETURN_NAMES = ("status",)
     OUTPUT_NODE = True
 
+    GITHUB_RAW_BASE = "https://raw.githubusercontent.com/EvoLinkAI/awesome-gpt-image-2-prompts/main"
+    GITHUB_API_COMMITS = "https://api.github.com/repos/EvoLinkAI/awesome-gpt-image-2-prompts/commits?per_page=1&path=README.md"
+
+    # Section keyword mapping for category detection
+    SECTION_KEYWORDS = {
+        "portrait": ["portrait", "photo", "photography"],
+        "poster": ["poster", "illustration"],
+        "character": ["character"],
+        "ui": ["ui", "social media", "mockup"],
+        "comparison": ["comparison", "community"],
+        "ecommerce": ["e-commerce", "ecommerce"],
+        "ad_creative": ["ad creative", "ad-creative"],
+    }
+
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "rebuild_from_readme": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
-                "git_pull_first": ("BOOLEAN", {"default": False, "label_on": "Yes", "label_off": "No"}),
+                "check_remote": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
             },
         }
 
-    def update_prompts(self, rebuild_from_readme, git_pull_first):
-        import subprocess
-        import sys
+    def _download_text(self, url):
+        """Download text content from URL."""
+        import urllib.request
+        req = urllib.request.Request(url, headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return resp.read().decode("utf-8")
+
+    def _download_image(self, url, dest_path):
+        """Download image from URL to local path."""
+        import urllib.request
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+        req = urllib.request.Request(url, headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            with open(dest_path, "wb") as f:
+                f.write(resp.read())
+
+    def _detect_section(self, line):
+        """Detect section category from a ## heading line."""
+        line_lower = line.lower()
+        for cat, keywords in self.SECTION_KEYWORDS.items():
+            for kw in keywords:
+                if kw in line_lower:
+                    return cat
+        return None
+
+    def _infer_category(self, folder_name):
+        """Infer category from folder name."""
+        for prefix in ["portrait", "poster", "character", "ui", "comparison", "ecommerce", "ad_creative"]:
+            if folder_name.startswith(prefix + "_"):
+                return prefix
+        if folder_name.startswith("ad_"):
+            return "ad_creative"
+        return "other"
+
+    def _parse_readme_content(self, content):
+        """Parse README content and return list of case dicts."""
+        import re
+        lines = content.split("\n")
+        cases = []
+        current_section = "other"
+        i = 0
+
+        while i < len(lines):
+            line = lines[i]
+
+            if line.startswith("## "):
+                detected = self._detect_section(line)
+                if detected:
+                    current_section = detected
+
+            case_match = re.match(r'###\s*Case\s+(\d+):', line)
+            if case_match:
+                case_num = case_match.group(1)
+                title_match = re.search(r'\[([^\]]+)\]', line)
+                title = title_match.group(1) if title_match else f"Case {case_num}"
+                author_match = re.search(r'by\s*\[@?([^\])\s]+)', line)
+                author = author_match.group(1) if author_match else ""
+
+                image_path = ""
+                prompt_text = ""
+                j = i + 1
+                while j < len(lines) and j < i + 50:
+                    if re.match(r'###\s*Case\s+\d+:', lines[j]):
+                        break
+                    if not image_path:
+                        img_match = re.search(r'src="\.?/?\s*(images/[^"]+)"', lines[j])
+                        if img_match:
+                            image_path = img_match.group(1)
+                        else:
+                            md_match = re.search(r'!\[[^\]]*\]\(\.?/?\s*(images/[^)]+)\)', lines[j])
+                            if md_match:
+                                image_path = md_match.group(1)
+                    if lines[j].strip() == "```":
+                        k = j + 1
+                        prompt_lines = []
+                        while k < len(lines) and lines[k].strip() != "```":
+                            prompt_lines.append(lines[k])
+                            k += 1
+                        if prompt_lines:
+                            prompt_text = "\n".join(prompt_lines).strip()
+                        j = k
+                    j += 1
+
+                if image_path:
+                    folder_name = image_path.split("/")[1] if "/" in image_path else ""
+                    if current_section == "other" and folder_name:
+                        inferred = self._infer_category(folder_name)
+                        if inferred != "other":
+                            current_section = inferred
+
+                    cases.append({
+                        "id": f"{current_section}_case{case_num}",
+                        "category": current_section,
+                        "case_num": int(case_num),
+                        "title": title[:200],
+                        "author": author,
+                        "text": prompt_text,
+                        "image_path": image_path,
+                        "image_exists": False,
+                        "source": "github_sync",
+                    })
+            i += 1
+
+        return cases
+
+    def update_prompts(self, check_remote):
+        import urllib.request
 
         status_parts = []
 
-        # Record pre-update counts for comparison
-        old_presets = _load_json(LOCAL_PROMPTS_JSON, [])
-        old_count = len(old_presets)
-        old_with_text = sum(1 for p in old_presets if p.get("text", "").strip())
+        # Load existing local data (NEVER delete these)
+        existing_presets = _load_json(LOCAL_PROMPTS_JSON, [])
+        old_count = len(existing_presets)
+        old_with_text = sum(1 for p in existing_presets if p.get("text", "").strip())
 
-        # Optionally git pull the repo first
-        if git_pull_first:
-            try:
-                result = subprocess.run(
-                    ["git", "pull"],
-                    cwd=REPO_ROOT,
-                    capture_output=True, text=True, timeout=60
-                )
-                if result.returncode == 0:
-                    status_parts.append(f"Git pull: {result.stdout.strip()}")
+        # Build set of existing image_paths for deduplication
+        existing_image_paths = set()
+        for p in existing_presets:
+            img = p.get("image_path", "")
+            if img:
+                existing_image_paths.add(img)
+
+        if not check_remote:
+            status_parts.append("Remote check disabled. No changes made.")
+            status_str = "\n".join(status_parts)
+            return {"ui": {"status": [status_str], "preset_count": [old_count], "with_images": [0]}, "result": (status_str,)}
+
+        # ========== Step 1: Check remote for updates ==========
+        status_parts.append("[Step 1] Checking remote repository...")
+        latest_sha = ""
+        try:
+            req = urllib.request.Request(
+                self.GITHUB_API_COMMITS,
+                headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"}
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                commits = json.loads(resp.read().decode("utf-8"))
+            if commits:
+                latest_sha = commits[0].get("sha", "")[:7]
+                latest_date = commits[0].get("commit", {}).get("committer", {}).get("date", "")
+                latest_msg = commits[0].get("commit", {}).get("message", "").split("\n")[0][:100]
+                status_parts.append(f"  Remote latest: {latest_sha} ({latest_date})")
+                status_parts.append(f"  Message: {latest_msg}")
+        except Exception as e:
+            status_parts.append(f"  Remote check failed: {e}")
+
+        # ========== Step 2: Download and parse README ==========
+        status_parts.append("\n[Step 2] Downloading README from GitHub...")
+        remote_cases = []
+        try:
+            readme_url = f"{self.GITHUB_RAW_BASE}/README.md"
+            readme_content = self._download_text(readme_url)
+            remote_cases = self._parse_readme_content(readme_content)
+            status_parts.append(f"  Parsed {len(remote_cases)} cases from remote README")
+        except Exception as e:
+            status_parts.append(f"  Download/parse failed: {e}")
+            # Return without changes
+            status_str = "\n".join(status_parts)
+            return {"ui": {"status": [status_str], "preset_count": [old_count], "with_images": [0]}, "result": (status_str,)}
+
+        # ========== Step 3: Find NEW entries (incremental merge) ==========
+        status_parts.append("\n[Step 3] Finding new entries (incremental merge)...")
+        new_cases = []
+        for case in remote_cases:
+            img_path = case.get("image_path", "")
+            if img_path and img_path not in existing_image_paths:
+                new_cases.append(case)
+
+        status_parts.append(f"  New cases to add: {len(new_cases)}")
+        status_parts.append(f"  Already existing: {len(remote_cases) - len(new_cases)}")
+
+        if not new_cases:
+            status_parts.append("\n  No new content to add. Everything is up to date.")
+        else:
+            # ========== Step 4: Download images for new entries ==========
+            status_parts.append(f"\n[Step 4] Downloading images for {len(new_cases)} new entries...")
+            downloaded = 0
+            failed = 0
+            for case in new_cases:
+                img_rel = case["image_path"]  # e.g. "images/portrait_case1/output.jpg"
+                # Store at IMAGE_BASE/images/portrait_case1/output.jpg (matches _get_prompt_image_path)
+                local_dest = os.path.join(IMAGE_BASE, img_rel.replace("/", os.sep))
+
+                if not os.path.isfile(local_dest):
+                    try:
+                        img_url = f"{self.GITHUB_RAW_BASE}/{img_rel}"
+                        self._download_image(img_url, local_dest)
+                        case["image_exists"] = True
+                        downloaded += 1
+                    except Exception:
+                        case["image_exists"] = False
+                        failed += 1
                 else:
-                    status_parts.append(f"Git pull failed: {result.stderr.strip()}")
-            except Exception as e:
-                status_parts.append(f"Git pull error: {e}")
+                    case["image_exists"] = True
 
-        # Rebuild local_prompts.json from all READMEs + images/ scan + git history
-        if rebuild_from_readme:
-            try:
-                build_script = os.path.join(NODE_DIR, "build_local_prompts.py")
-                result = subprocess.run(
-                    [sys.executable, build_script],
-                    capture_output=True, text=True, timeout=300
-                )
-                if result.returncode == 0:
-                    # Extract key lines from output
-                    lines = result.stdout.strip().split("\n")
-                    summary_lines = [l for l in lines if "total" in l.lower() or "stage" in l.lower()
-                                     or "recovered" in l.lower() or "skipping" in l.lower()
-                                     or "===" in l]
-                    output = "\n".join(summary_lines[-10:]) if summary_lines else result.stdout.strip()[-500:]
-                    status_parts.append(f"Rebuild: {output}")
-                else:
-                    status_parts.append(f"Rebuild failed: {result.stderr.strip()[:500]}")
-            except Exception as e:
-                status_parts.append(f"Rebuild error: {e}")
+            status_parts.append(f"  Downloaded: {downloaded}, Already existed: {len(new_cases) - downloaded - failed}, Failed: {failed}")
 
-        # Count new results and compare
+            # ========== Step 5: Merge into existing data (APPEND ONLY) ==========
+            existing_presets.extend(new_cases)
+            # Sort by category and case_num
+            existing_presets.sort(key=lambda c: (c.get("category", "other"), c.get("case_num", 0)))
+            # Deduplicate IDs
+            seen_ids = set()
+            for c in existing_presets:
+                base_id = c["id"]
+                if base_id in seen_ids:
+                    suffix = 1
+                    while f"{base_id}_{suffix}" in seen_ids:
+                        suffix += 1
+                    c["id"] = f"{base_id}_{suffix}"
+                seen_ids.add(c["id"])
+
+            # Save
+            _save_json(LOCAL_PROMPTS_JSON, existing_presets)
+            status_parts.append(f"\n  Added {len(new_cases)} new entries. Total now: {len(existing_presets)}")
+
+        # ========== Also update prompt text for existing entries with empty text ==========
+        updated_text_count = 0
+        if remote_cases:
+            remote_by_img = {c["image_path"]: c for c in remote_cases if c.get("text", "").strip()}
+            for p in existing_presets:
+                img = p.get("image_path", "")
+                if img and not p.get("text", "").strip() and img in remote_by_img:
+                    p["text"] = remote_by_img[img]["text"]
+                    updated_text_count += 1
+            if updated_text_count > 0:
+                _save_json(LOCAL_PROMPTS_JSON, existing_presets)
+                status_parts.append(f"  Updated prompt text for {updated_text_count} existing entries.")
+
+        # Final stats
         presets = _load_json(LOCAL_PROMPTS_JSON, [])
         customs = _load_json(CUSTOM_PROMPTS_JSON, [])
         new_count = len(presets)
         new_with_text = sum(1 for p in presets if p.get("text", "").strip())
-
-        # Check images
         with_images = sum(1 for p in presets if _get_prompt_image_path(p))
 
+        status_parts.append(f"\n=== RESULT ===")
         status_parts.append(f"Total: {new_count} presets ({new_with_text} with prompt text), {len(customs)} custom.")
         status_parts.append(f"Presets with local images: {with_images}/{new_count}")
 
-        # Show delta
-        if old_count > 0:
-            delta = new_count - old_count
-            text_delta = new_with_text - old_with_text
-            if delta != 0 or text_delta != 0:
-                status_parts.append(f"Changes: {delta:+d} presets, {text_delta:+d} with text")
-            else:
-                status_parts.append("No changes detected (already up to date).")
+        delta = new_count - old_count
+        text_delta = new_with_text - old_with_text
+        if delta > 0 or text_delta > 0:
+            status_parts.append(f"Changes: +{delta} presets, +{text_delta} with text")
+        else:
+            status_parts.append("No new entries added (already up to date).")
 
         _save_json(UPDATE_STATE_FILE, {
             "last_update": time.time(),
             "last_update_time": datetime.now().isoformat(),
-            "prompt_count": len(presets),
+            "prompt_count": new_count,
             "with_images": with_images,
+            "last_remote_sha": latest_sha,
         })
 
         status_str = "\n".join(status_parts)

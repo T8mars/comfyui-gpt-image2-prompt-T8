@@ -1,0 +1,20 @@
+[
+  {
+    "id": "custom_1777350576_0",
+    "text": "Main subject in realistic cosplay style in foreground\" + \"secondary characters in 2D illustration style in background\" ,pink hair,\n \"NIKKE DORO\"elegant serif typography, \" \"Cinematic studio lighting\"  \"Baroque dark fantasy\"",
+    "name": "Dora Cinematic",
+    "category": "custom",
+    "createdAt": "2026-04-28T12:29:36.927243",
+    "thumbnail": "F:\\AI-T8-video-onekey\\ComfyUI\\custom_nodes\\comfyui-gpt-image2-prompt\\data\\custom_prompts\\custom_1777350576_0.jpg",
+    "image_exists": true
+  },
+  {
+    "id": "custom_1777351515_1",
+    "text": "Main subject in realistic cosplay style in foreground\" + \"secondary characters in 2D illustration style in background\" ,pink hair,\n \"NIKKE DORO\"elegant serif typography, \" \"Cinematic studio lighting\"  \"Baroque dark fantasy\"",
+    "name": "Main subject in realistic cosplay style in foregro",
+    "category": "custom",
+    "createdAt": "2026-04-28T12:45:15.473523",
+    "image_path": "custom_prompts/custom_1777351515_1.jpg",
+    "image_exists": true
+  }
+]

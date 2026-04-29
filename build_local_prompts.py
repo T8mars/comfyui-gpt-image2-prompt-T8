@@ -9,19 +9,36 @@ import json
 import shutil
 from pathlib import Path
 
-NODE_DIR = Path(__file__).parent                     # comfyui-gpt-image2-prompt/
-REPO_ROOT = NODE_DIR.parent                          # awesome-gpt-image-2-prompts/  (source)
-SRC_IMAGES_DIR = REPO_ROOT / "images"                 # Source images in repo root
-LOCAL_IMAGES_DIR = NODE_DIR / "data" / "images"       # Destination inside node dir
-OUTPUT_JSON = NODE_DIR / "data" / "local_prompts.json"
+NODE_DIR = Path(__file__).resolve().parent            # comfyui-gpt-image2-prompt/
+REPO_ROOT = NODE_DIR.parent                          # parent directory (may or may not be repo)
+
+# Source images: prefer NODE_DIR/images/ (self-contained install),
+# fallback to REPO_ROOT/images/ (dev/repo structure)
+# Use os.path.isdir for reliable Windows path checking
+_SRC_IN_NODE = str(NODE_DIR / "images")
+_SRC_IN_REPO = str(REPO_ROOT / "images")
+if os.path.isdir(_SRC_IN_NODE):
+    SRC_IMAGES_DIR = _SRC_IN_NODE
+elif os.path.isdir(_SRC_IN_REPO):
+    SRC_IMAGES_DIR = _SRC_IN_REPO
+else:
+    SRC_IMAGES_DIR = _SRC_IN_NODE  # Will fail with clear error later
+
+LOCAL_IMAGES_DIR = str(NODE_DIR / "data" / "images")  # Destination inside node dir
+OUTPUT_JSON = str(NODE_DIR / "data" / "local_prompts.json")
+
+# GitHub raw base URL for downloading README files
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/EvoLinkAI/awesome-gpt-image-2-prompts/main"
 
 # Section keyword mapping (works across languages)
 SECTION_KEYWORDS = {
-    "portrait": ["portrait", "photo", "retrato", "portr", "ritratt"],
+    "portrait": ["portrait", "photo", "retrato", "portr", "ritratt", "photography"],
     "poster": ["poster", "illustration", "cartel", "affiche", "plakat"],
     "character": ["character", "personaje", "personnage", "karakter", "charakt"],
     "ui": ["ui", "social media", "mockup", "interfaz", "maquette"],
     "comparison": ["comparison", "community", "comparaci", "comparais", "vergleich"],
+    "ecommerce": ["e-commerce", "ecommerce", "comercio", "e-kommerz"],
+    "ad_creative": ["ad creative", "ad-creative", "publicidad", "werbung", "publicit"],
 }
 
 
@@ -38,12 +55,17 @@ def detect_section(line):
 def parse_single_readme(readme_path, existing_image_paths):
     """Parse one README file, return list of case dicts.
     existing_image_paths: set of image_path already found, to avoid duplicates.
+    Accepts cases with image even if prompt is empty.
     """
-    content = readme_path.read_text(encoding="utf-8")
+    if isinstance(readme_path, Path):
+        content = readme_path.read_text(encoding="utf-8")
+    else:
+        content = readme_path  # Already string content (e.g. downloaded)
     lines = content.split("\n")
     cases = []
     current_section = "other"
     i = 0
+    source_name = readme_path.name if isinstance(readme_path, Path) else "downloaded"
 
     while i < len(lines):
         line = lines[i]
@@ -70,22 +92,26 @@ def parse_single_readme(readme_path, existing_image_paths):
             # Look ahead for image path and prompt (search up to 50 lines)
             image_path = ""
             prompt_text = ""
+            found_prompt_block = False
             j = i + 1
             while j < len(lines) and j < i + 50:
+                # Stop if we hit the next case heading
+                if re.match(r'###\s*Case\s+\d+:', lines[j]):
+                    break
+
                 # Find image - match HTML src="./images/..." AND Markdown ![...](images/...)
                 if not image_path:
-                    # HTML: <img src="./images/..." or src="images/..."
                     img_match = re.search(r'src="\.?/?\s*(images/[^"]+)"', lines[j])
                     if img_match:
                         image_path = img_match.group(1)
                     else:
-                        # Markdown: ![alt text](./images/...) or ![alt](images/...)
                         md_match = re.search(r'!\[[^\]]*\]\(\.?/?\s*(images/[^)]+)\)', lines[j])
                         if md_match:
                             image_path = md_match.group(1)
 
                 # Find prompt code block (``` after **Prompt** section)
-                if lines[j].strip() == "```" and j > i + 2:
+                if lines[j].strip() == "```" and not found_prompt_block:
+                    found_prompt_block = True
                     k = j + 1
                     prompt_lines = []
                     while k < len(lines):
@@ -95,20 +121,20 @@ def parse_single_readme(readme_path, existing_image_paths):
                         k += 1
                     if prompt_lines:
                         prompt_text = "\n".join(prompt_lines).strip()
-                    break
+                    j = k  # Skip past the closing ```
                 j += 1
 
-            # Only add if we have both image and prompt, and image is not a duplicate
-            if image_path and prompt_text and image_path not in existing_image_paths:
-                full_img_path = REPO_ROOT / image_path
-                if full_img_path.exists():
+            # Accept case if we have image (prompt may be empty)
+            if image_path and image_path not in existing_image_paths:
+                # Verify image exists locally
+                img_exists = _check_image_exists(image_path)
+                if img_exists:
                     # Infer category from image folder name if section is generic
                     folder_name = image_path.split("/")[1] if "/" in image_path else ""
                     if current_section == "other" and folder_name:
-                        for prefix in ["portrait", "poster", "character", "ui", "comparison"]:
-                            if folder_name.startswith(prefix + "_"):
-                                current_section = prefix
-                                break
+                        inferred = _infer_category_from_folder(folder_name)
+                        if inferred != "other":
+                            current_section = inferred
 
                     cases.append({
                         "id": f"{current_section}_case{case_num}",
@@ -119,7 +145,7 @@ def parse_single_readme(readme_path, existing_image_paths):
                         "text": prompt_text,
                         "image_path": image_path,
                         "image_exists": True,
-                        "source": readme_path.name,
+                        "source": source_name,
                     })
                     existing_image_paths.add(image_path)
 
@@ -128,22 +154,52 @@ def parse_single_readme(readme_path, existing_image_paths):
     return cases
 
 
+def _check_image_exists(image_rel_path):
+    """Check if an image exists in any known location."""
+    # Try SRC_IMAGES_DIR parent (e.g. REPO_ROOT/images/xxx or NODE_DIR/images/xxx)
+    candidates = [
+        os.path.join(SRC_IMAGES_DIR, os.sep.join(image_rel_path.split("/")[1:])),  # images/xxx -> SRC/xxx
+        os.path.join(str(NODE_DIR), image_rel_path.replace("/", os.sep)),
+        os.path.join(str(REPO_ROOT), image_rel_path.replace("/", os.sep)),
+        os.path.join(LOCAL_IMAGES_DIR, os.sep.join(image_rel_path.split("/")[1:])),  # Already in data/images/
+    ]
+    for p in candidates:
+        if os.path.isfile(p):
+            return True
+    return False
+
+
 def _infer_category_from_folder(folder_name):
     """Infer category from folder name prefix like 'portrait_case1'."""
-    for prefix in ["portrait", "poster", "character", "ui", "comparison"]:
+    for prefix in ["portrait", "poster", "character", "ui", "comparison", "ecommerce", "ad_creative"]:
         if folder_name.startswith(prefix + "_"):
             return prefix
+    # Additional prefix patterns
+    if folder_name.startswith("ad_"):
+        return "ad_creative"
+    if folder_name.startswith("ecom_"):
+        return "ecommerce"
     return "other"
 
 
 def _find_best_image(folder_path):
     """Find the best image file in a folder (prefer output.jpg)."""
-    folder = Path(folder_path)
-    # Prefer output.jpg, then output*.jpg, then any image
-    for pattern in ["output.jpg", "output*.jpg", "output*.png", "*.jpg", "*.png"]:
-        matches = list(folder.glob(pattern))
-        if matches:
-            return matches[0].name
+    folder_str = str(folder_path)
+    if not os.path.isdir(folder_str):
+        return ""
+    files = os.listdir(folder_str)
+    # Priority order
+    for name in ["output.jpg", "output.png"]:
+        if name in files:
+            return name
+    # Then output*.jpg/png
+    for f in sorted(files):
+        if f.startswith("output") and (f.endswith(".jpg") or f.endswith(".png")):
+            return f
+    # Then any image
+    for f in sorted(files):
+        if f.endswith((".jpg", ".jpeg", ".png", ".webp")):
+            return f
     return ""
 
 
@@ -151,12 +207,13 @@ def _build_md5_map():
     """Build MD5 hash map for all output.jpg files in source images/ directory."""
     import hashlib
     md5_map = {}  # hash -> list of folder names
-    if not SRC_IMAGES_DIR.exists():
+    if not os.path.isdir(SRC_IMAGES_DIR):
         return md5_map
     for folder_name in os.listdir(SRC_IMAGES_DIR):
-        img = SRC_IMAGES_DIR / folder_name / "output.jpg"
-        if img.is_file():
-            h = hashlib.md5(img.read_bytes()).hexdigest()
+        img = os.path.join(SRC_IMAGES_DIR, folder_name, "output.jpg")
+        if os.path.isfile(img):
+            with open(img, "rb") as f:
+                h = hashlib.md5(f.read()).hexdigest()
             md5_map.setdefault(h, []).append(folder_name)
     return md5_map
 
@@ -166,7 +223,8 @@ def scan_images_directory(existing_image_paths):
     Creates entries for uncovered folders (image-only, no prompt text from README).
     Automatically skips folders that are duplicates of already-covered folders.
     """
-    if not SRC_IMAGES_DIR.exists():
+    if not os.path.isdir(SRC_IMAGES_DIR):
+        print(f"  [Warning] SRC_IMAGES_DIR does not exist: {SRC_IMAGES_DIR}")
         return []
 
     cases = []
@@ -185,8 +243,12 @@ def scan_images_directory(existing_image_paths):
             folder_hash[f] = h
 
     for folder_name in sorted(os.listdir(SRC_IMAGES_DIR)):
-        folder_path = SRC_IMAGES_DIR / folder_name
-        if not folder_path.is_dir() or folder_name in covered_folders:
+        folder_path = os.path.join(SRC_IMAGES_DIR, folder_name)
+        if not os.path.isdir(folder_path) or folder_name in covered_folders:
+            continue
+
+        # Skip non-case folders (like 'logo.png' file or special dirs)
+        if folder_name.startswith("."):
             continue
 
         # Find an image file in this folder
@@ -199,7 +261,6 @@ def scan_images_directory(existing_image_paths):
         if h:
             same_hash_folders = md5_map.get(h, [])
             if any(f in covered_folders for f in same_hash_folders):
-                print(f"    Skipping {folder_name} (duplicate of {[f for f in same_hash_folders if f in covered_folders]})")
                 continue
 
         image_path = f"images/{folder_name}/{img_file}"
@@ -252,11 +313,26 @@ def _recover_from_git_history(empty_cases):
 
     print(f"    Looking for {len(folder_map)} missing prompts in git history...")
 
+    # Determine git working directory (could be NODE_DIR or REPO_ROOT)
+    git_cwd = None
+    for candidate in [NODE_DIR, REPO_ROOT]:
+        try:
+            r = subprocess.run(["git", "rev-parse", "--git-dir"],
+                             cwd=str(candidate), capture_output=True, text=True, timeout=5)
+            if r.returncode == 0:
+                git_cwd = str(candidate)
+                break
+        except Exception:
+            continue
+    if not git_cwd:
+        print("    No git repository found, skipping git history recovery")
+        return 0
+
     # Get commits that modified README files
     historical_commits = []
     try:
         r = subprocess.run(["git", "log", "--all", "--oneline", "--format=%H", "--", "README.md"],
-                          cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=15)
+                          cwd=git_cwd, capture_output=True, text=True, timeout=15)
         if r.returncode == 0:
             historical_commits = [c for c in r.stdout.strip().split("\n") if c][:MAX_COMMITS]
     except Exception:
@@ -291,7 +367,7 @@ def _recover_from_git_history(empty_cases):
                 break
             try:
                 r = subprocess.run(["git", "show", f"{commit}:{rf}"],
-                                 cwd=str(REPO_ROOT), capture_output=True, timeout=10)
+                                 cwd=git_cwd, capture_output=True, timeout=10)
                 if r.returncode != 0:
                     continue
                 content = r.stdout.decode("utf-8", errors="replace")
@@ -364,16 +440,75 @@ def _recover_from_git_history(empty_cases):
     return count
 
 
-def main():
-    # ========== Stage 1: Parse all README files ==========
-    readme_files = []
-    main_readme = REPO_ROOT / "README.md"
-    if main_readme.exists():
-        readme_files.append(main_readme)
-    for f in sorted(REPO_ROOT.glob("README_*.md")):
-        readme_files.append(f)
+def _download_readme_from_github(filename="README.md"):
+    """Download a README file from GitHub. Returns content string or None."""
+    import urllib.request
+    url = f"{GITHUB_RAW_BASE}/{filename}"
+    try:
+        print(f"  Downloading {url} ...")
+        req = urllib.request.Request(url, headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            content = resp.read().decode("utf-8")
+        if "### Case" in content:
+            return content
+        print(f"  Downloaded but no cases found in {filename}")
+        return None
+    except Exception as e:
+        print(f"  Download failed: {e}")
+        return None
 
-    print(f"[Stage 1] Parsing {len(readme_files)} README files...")
+
+def _is_case_readme(filepath):
+    """Check if a README file contains case definitions (### Case N:)."""
+    try:
+        with open(str(filepath), "r", encoding="utf-8") as f:
+            # Read first 5000 chars to check
+            head = f.read(5000)
+        return "### Case" in head or "## " in head and "Portrait" in head
+    except Exception:
+        return False
+
+
+def main():
+    print(f"[Config] NODE_DIR = {NODE_DIR}")
+    print(f"[Config] SRC_IMAGES_DIR = {SRC_IMAGES_DIR} (exists={os.path.isdir(SRC_IMAGES_DIR)})")
+    print(f"[Config] LOCAL_IMAGES_DIR = {LOCAL_IMAGES_DIR}")
+
+    # Load existing data for safety comparison
+    existing_presets = []
+    if os.path.isfile(OUTPUT_JSON):
+        try:
+            with open(OUTPUT_JSON, "r", encoding="utf-8") as f:
+                existing_presets = json.load(f)
+        except Exception:
+            pass
+
+    # ========== Stage 1: Parse all README files ==========
+    readme_files = []  # List of Path objects
+    readme_contents = []  # List of (source_name, content_string) for downloaded READMEs
+
+    # Look for case READMEs locally (NODE_DIR first, then REPO_ROOT)
+    for search_dir in [NODE_DIR, REPO_ROOT]:
+        main_readme = search_dir / "README.md"
+        if os.path.isfile(str(main_readme)) and _is_case_readme(str(main_readme)):
+            if main_readme not in readme_files:
+                readme_files.append(main_readme)
+        for f in sorted(Path(str(search_dir)).glob("README_*.md")):
+            if os.path.isfile(str(f)) and _is_case_readme(str(f)):
+                if f not in readme_files:
+                    readme_files.append(f)
+
+    # If no case READMEs found locally, download from GitHub
+    if not readme_files:
+        print("  No local case README found, downloading from GitHub...")
+        readme_names = ["README.md", "README_zh-CN.md", "README_de.md"]
+        for rname in readme_names:
+            content = _download_readme_from_github(rname)
+            if content:
+                readme_contents.append((rname, content))
+                break  # One good README is enough
+
+    print(f"[Stage 1] Parsing {len(readme_files) + len(readme_contents)} README files...")
 
     all_cases = []
     existing_image_paths = set()
@@ -384,8 +519,14 @@ def main():
             print(f"  {readme_path.name}: {len(cases)} new cases")
         all_cases.extend(cases)
 
+    for source_name, content in readme_contents:
+        cases = parse_single_readme(content, existing_image_paths)
+        if cases:
+            print(f"  {source_name} (downloaded): {len(cases)} new cases")
+        all_cases.extend(cases)
+
     readme_count = len(all_cases)
-    print(f"  README total: {readme_count} cases with prompt + image")
+    print(f"  README total: {readme_count} cases")
 
     # ========== Stage 2: Scan images/ directory for uncovered folders ==========
     print(f"\n[Stage 2] Scanning images/ directory for uncovered folders...")
@@ -434,22 +575,40 @@ def main():
         print(f"  {cat}: {count}")
 
     # Verify coverage against source images/ directory
-    all_img_folders = set(f for f in os.listdir(SRC_IMAGES_DIR) if (SRC_IMAGES_DIR / f).is_dir())
-    covered_folders = set()
-    for c in all_cases:
-        parts = c["image_path"].split("/")
-        if len(parts) >= 2:
-            covered_folders.add(parts[1])
+    if os.path.isdir(SRC_IMAGES_DIR):
+        all_img_folders = set(f for f in os.listdir(SRC_IMAGES_DIR)
+                             if os.path.isdir(os.path.join(SRC_IMAGES_DIR, f)))
+        covered_folders = set()
+        for c in all_cases:
+            parts = c["image_path"].split("/")
+            if len(parts) >= 2:
+                covered_folders.add(parts[1])
 
-    uncovered = all_img_folders - covered_folders
-    print(f"\nSource image folders: {len(all_img_folders)}")
-    print(f"Covered: {len(covered_folders)}")
-    if uncovered:
-        print(f"WARNING: {len(uncovered)} folders still uncovered!")
-        for f in sorted(uncovered):
-            print(f"  {f}")
+        uncovered = all_img_folders - covered_folders
+        print(f"\nSource image folders: {len(all_img_folders)}")
+        print(f"Covered: {len(covered_folders)}")
+        if uncovered:
+            print(f"WARNING: {len(uncovered)} folders still uncovered!")
+            for f in sorted(list(uncovered)[:20]):
+                print(f"  {f}")
+        else:
+            print(f"All {len(all_img_folders)} image folders covered!")
     else:
-        print(f"All {len(all_img_folders)} image folders covered!")
+        print(f"\n[Info] SRC_IMAGES_DIR not found, skipping coverage verification.")
+
+    # ========== Safety Check ==========
+    old_preset_count = len([p for p in existing_presets if not p.get("id", "").startswith("custom_")])
+    new_preset_count = len(all_cases)
+    if old_preset_count > 0 and new_preset_count == 0:
+        print(f"\n[SAFETY] Rebuild produced 0 entries but existing has {old_preset_count}. NOT overwriting!")
+        print(f"  This usually means README source was not found. Check paths and network.")
+        return
+    if old_preset_count > 50 and new_preset_count < old_preset_count * 0.5:
+        print(f"\n[SAFETY] New count ({new_preset_count}) is less than 50% of old ({old_preset_count}). NOT overwriting!")
+        print(f"  Pass --force to override this safety check.")
+        import sys
+        if "--force" not in sys.argv:
+            return
 
     # ========== Stage 4: Copy images to node data/images/ directory ==========
     print(f"\n[Stage 4] Copying images to {LOCAL_IMAGES_DIR}...")
@@ -458,22 +617,42 @@ def main():
     skipped = 0
     for c in all_cases:
         img_rel = c["image_path"]  # e.g. "images/portrait_case1/output.jpg"
-        src_path = REPO_ROOT / img_rel
-        dst_path = NODE_DIR / "data" / img_rel  # -> data/images/portrait_case1/output.jpg
-        if src_path.is_file():
-            os.makedirs(dst_path.parent, exist_ok=True)
-            if dst_path.exists() and dst_path.stat().st_size == src_path.stat().st_size:
+        img_parts = img_rel.replace("/", os.sep).split(os.sep)  # ["images", "portrait_case1", "output.jpg"]
+        # Sub-path within images/ dir
+        sub_path = os.sep.join(img_parts[1:]) if len(img_parts) > 1 else img_parts[0]
+
+        # Try multiple source locations
+        src_path = None
+        candidates = [
+            os.path.join(SRC_IMAGES_DIR, sub_path),
+            os.path.join(str(NODE_DIR), img_rel.replace("/", os.sep)),
+            os.path.join(str(REPO_ROOT), img_rel.replace("/", os.sep)),
+        ]
+        for candidate in candidates:
+            if os.path.isfile(candidate):
+                src_path = candidate
+                break
+
+        dst_path = os.path.join(LOCAL_IMAGES_DIR, sub_path)
+        if src_path:
+            os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+            if os.path.isfile(dst_path) and os.path.getsize(dst_path) == os.path.getsize(src_path):
                 skipped += 1
             else:
-                shutil.copy2(str(src_path), str(dst_path))
+                shutil.copy2(src_path, dst_path)
                 copied += 1
             c["image_exists"] = True
         else:
-            c["image_exists"] = False
+            # Check if already in destination
+            if os.path.isfile(dst_path):
+                skipped += 1
+                c["image_exists"] = True
+            else:
+                c["image_exists"] = False
     print(f"  Copied {copied} images, skipped {skipped} (already up to date)")
 
     # ========== Save ==========
-    os.makedirs(OUTPUT_JSON.parent, exist_ok=True)
+    os.makedirs(os.path.dirname(OUTPUT_JSON), exist_ok=True)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(all_cases, f, ensure_ascii=False, indent=2)
 
