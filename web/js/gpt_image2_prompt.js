@@ -24,6 +24,260 @@ function buildImageUrl(imagePath) {
     return `${origin}/gpt_image2_prompt/image?path=${encodeURIComponent(imagePath)}`;
 }
 
+// ============================================================
+// Hover Preview Cache (shared across all hover interactions)
+// ============================================================
+const _hoverCache = {};
+
+/**
+ * Check if a text looks like one of our prompt selection strings.
+ */
+function isPromptSelection(text) {
+    return text && (text.startsWith("[preset_") || text.startsWith("[custom_"));
+}
+
+/**
+ * Create a floating hover preview panel (singleton).
+ * Appears next to dropdown items when hovering to show preview image + title.
+ */
+function createHoverPreview() {
+    const panel = document.createElement("div");
+    panel.id = "gpt-image2-hover-preview";
+    panel.style.cssText = [
+        "position: fixed",
+        "z-index: 100000",
+        "background: #1a1a2e",
+        "border: 2px solid #555",
+        "border-radius: 8px",
+        "padding: 6px",
+        "display: none",
+        "pointer-events: none",
+        "box-shadow: 0 4px 24px rgba(0,0,0,0.7)",
+        "max-width: 320px",
+    ].join(";");
+
+    const img = document.createElement("img");
+    img.style.cssText = [
+        "max-width: 300px",
+        "max-height: 300px",
+        "border-radius: 4px",
+        "display: none",
+    ].join(";");
+    img.crossOrigin = "anonymous";
+    panel.appendChild(img);
+
+    const titleEl = document.createElement("div");
+    titleEl.style.cssText = [
+        "color: #fff",
+        "font-size: 11px",
+        "padding: 4px 2px 0",
+        "text-align: center",
+        "max-width: 300px",
+        "overflow: hidden",
+        "text-overflow: ellipsis",
+        "white-space: nowrap",
+    ].join(";");
+    panel.appendChild(titleEl);
+
+    const loading = document.createElement("div");
+    loading.style.cssText = "color:#888; font-size:11px; padding:16px; text-align:center;";
+    loading.textContent = "Loading...";
+    panel.appendChild(loading);
+
+    img.onload = () => {
+        img.style.display = "block";
+        loading.style.display = "none";
+    };
+    img.onerror = () => {
+        img.style.display = "none";
+        loading.style.display = "block";
+        loading.textContent = "No preview";
+    };
+
+    document.body.appendChild(panel);
+
+    let fetchTimer = null;
+    let currentSelection = "";
+
+    function applyData(data) {
+        if (data.image_path && data.has_image) {
+            const url = buildImageUrl(data.image_path);
+            img.src = url;
+            titleEl.textContent = `[${data.category || ""}] ${data.title || ""}`;
+            loading.style.display = "none";
+        } else {
+            img.style.display = "none";
+            loading.style.display = "block";
+            loading.textContent = data.title ? `${data.title} (no image)` : "No preview image";
+            titleEl.textContent = "";
+        }
+    }
+
+    return {
+        panel,
+        show(x, y, selection) {
+            if (!selection || selection.startsWith("No prompts")) {
+                this.hide();
+                return;
+            }
+
+            currentSelection = selection;
+            panel.style.display = "block";
+
+            // Position to the right of the dropdown, keep within viewport
+            const pw = 320;
+            const ph = 360;
+            let left = x + 12;
+            let top = y - 40;
+            if (left + pw > window.innerWidth) {
+                left = x - pw - 12;
+            }
+            if (top + ph > window.innerHeight) {
+                top = window.innerHeight - ph - 10;
+            }
+            if (top < 10) top = 10;
+            panel.style.left = left + "px";
+            panel.style.top = top + "px";
+
+            // Use cache if available
+            if (_hoverCache[selection]) {
+                applyData(_hoverCache[selection]);
+                return;
+            }
+
+            // Show loading state
+            img.style.display = "none";
+            loading.style.display = "block";
+            loading.textContent = "Loading...";
+            titleEl.textContent = "";
+
+            // Debounced fetch
+            clearTimeout(fetchTimer);
+            fetchTimer = setTimeout(async () => {
+                try {
+                    const resp = await api.fetchApi(
+                        `${RESOLVE_API}?selection=${encodeURIComponent(selection)}`
+                    );
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        _hoverCache[selection] = data;
+                        // Only update if still hovering the same item
+                        if (currentSelection === selection && panel.style.display !== "none") {
+                            applyData(data);
+                        }
+                    }
+                } catch (e) {
+                    if (currentSelection === selection) {
+                        loading.textContent = "Preview failed";
+                    }
+                }
+            }, 80);
+        },
+        hide() {
+            panel.style.display = "none";
+            img.src = "";
+            img.style.display = "none";
+            currentSelection = "";
+            clearTimeout(fetchTimer);
+        },
+    };
+}
+
+/**
+ * Attach hover preview events to a dropdown menu using event delegation.
+ * Works with LiteGraph context menus (.litemenu-entry) and PrimeVue lists.
+ */
+function attachMenuHover(menuEl, hoverPreview) {
+    if (menuEl._gptHoverAttached) return;
+    menuEl._gptHoverAttached = true;
+
+    const getMenuRight = () => menuEl.getBoundingClientRect().right;
+
+    menuEl.addEventListener("mouseover", (e) => {
+        const entry = e.target.closest(".litemenu-entry")
+            || e.target.closest("[role='option']")
+            || e.target.closest(".p-autocomplete-item");
+        if (!entry) return;
+
+        const text = entry.textContent?.trim() || "";
+        if (!isPromptSelection(text)) return;
+
+        const rect = entry.getBoundingClientRect();
+        hoverPreview.show(getMenuRight(), rect.top, text);
+    });
+
+    menuEl.addEventListener("mouseout", (e) => {
+        // Only hide if leaving the menu entirely (not moving between entries)
+        const related = e.relatedTarget;
+        if (related && menuEl.contains(related)) return;
+        hoverPreview.hide();
+    });
+
+    // Hide when menu is removed from DOM
+    const disconnectObserver = new MutationObserver(() => {
+        if (!menuEl.isConnected) {
+            hoverPreview.hide();
+            disconnectObserver.disconnect();
+        }
+    });
+    disconnectObserver.observe(menuEl.parentElement || document.body, { childList: true });
+}
+
+/**
+ * Initialize the global hover preview system.
+ * Uses MutationObserver to detect new dropdown menus appearing in the DOM.
+ */
+function initHoverPreviewSystem() {
+    const hoverPreview = createHoverPreview();
+
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            for (const added of mutation.addedNodes) {
+                if (added.nodeType !== 1) continue;
+
+                // Strategy 1: LiteGraph classic context menu
+                let menuEl = null;
+                if (added.classList?.contains("litecontextmenu")) {
+                    menuEl = added;
+                } else {
+                    menuEl = added.querySelector?.(".litecontextmenu");
+                }
+                if (menuEl) {
+                    // Small delay for entries to populate
+                    setTimeout(() => {
+                        const entries = menuEl.querySelectorAll(".litemenu-entry");
+                        if (entries.length > 0 && isPromptSelection(entries[0]?.textContent?.trim())) {
+                            attachMenuHover(menuEl, hoverPreview);
+                        }
+                    }, 30);
+                }
+
+                // Strategy 2: New ComfyUI frontend (PrimeVue / virtual lists)
+                const listbox = added.getAttribute?.("role") === "listbox"
+                    ? added
+                    : added.querySelector?.("[role='listbox']");
+                if (listbox) {
+                    setTimeout(() => {
+                        const items = listbox.querySelectorAll("[role='option']");
+                        if (items.length > 0 && isPromptSelection(items[0]?.textContent?.trim())) {
+                            attachMenuHover(listbox, hoverPreview);
+                        }
+                    }, 30);
+                }
+            }
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Cleanup on pointer down (menu closing)
+    document.addEventListener("pointerdown", () => {
+        setTimeout(() => hoverPreview.hide(), 100);
+    }, true);
+
+    console.log("[GPTImage2Prompt] Hover preview system initialized");
+}
+
 /**
  * Create a DOM-based image preview container element.
  */
@@ -746,5 +1000,6 @@ app.registerExtension({
 
     async setup() {
         console.log("[GPTImage2Prompt] Extension loaded v2. Images served locally.");
+        initHoverPreviewSystem();
     },
 });

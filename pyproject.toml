@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-gpt-image2-prompt"
 description = "ComfyUI custom nodes for GPT Image 2 curated prompts with thumbnail preview, auto-update from GitHub, and custom prompt management."
-version = "1.0.2"
+version = "1.0.3"
 license = "MIT"
 
 [project.urls]

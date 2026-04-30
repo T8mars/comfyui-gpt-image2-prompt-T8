@@ -1,3 +1,31 @@
+# 网站：[https://ai.t8star.cn](https://ai.t8star.cn/register?aff=cbff0534884)
+# Online workflow overseas：
+https://www.runninghub.ai/?inviteCode=rh-v1121
+# 在线工作流国内版：
+https://www.runninghub.cn/?inviteCode=rh-v1121
+# 👋🏻 Welcome to Zhenzhen
+
+<img src="https://github.com/T8mars/Comfyui-zhenzhen/blob/main/pic/1.png" width="30%" alt="My favorite girl">
+My favorite girl Go YounJung
+
+# 网站价格和宗旨：
+
+本站开设初衷是提供平价的API给粉丝朋友玩最新的海外模型，并非盈利目的，秉承这一理念，我们的价格毛利不到10%，去掉正常缴税和人工开发维护，服务器成本后几乎没有利润，所以并非盈利性质网站，没有任何议价空间，也不支持用于商业目的的二次开发，仅服务于粉丝朋友，望理解，每个月发票数量有限，需要自己承担所有税费5-25%
+
+# 网站使用及Api调用教程：
+
+网站使用教程：https://ai.t8star.cn/about
+
+API调用及开发教程：https://ai.t8star.cn/api-set
+
+# 贞贞的AI工坊新手无障碍整合包(windows版本)和教程：
+
+整合包(更新至v1.6)：https://pan.quark.cn/s/5e948ab145e1
+
+B站教程：https://www.bilibili.com/video/BV1nooQBsEAf/
+
+youtube教程：https://www.youtube.com/watch?v=oitmGaRtYvc
+
 # ComfyUI GPT Image 2 Prompts 🎨
 
 一个 ComfyUI 自定义节点包，提供 **300+ 精选 GPT Image 2 提示词**，支持本地图片预览、分类筛选、一键更新和自定义提示词管理。
@@ -5,12 +33,13 @@
 > 基于 [awesome-gpt-image-2-prompts](https://github.com/EvoLinkAI/awesome-gpt-image-2-prompts) 提示词集合库构建。
 
 ---
+## ✨ 更新日志
 
-## 更新日志
+20260430-3-增加悬停显示预览图模式，由于提示词模板越来越多，目前可以再选择时候鼠标悬停划过都会显示对应预览图
 
-20260430-2-增加GPT Image 2 Prompt Preview分类功能，新增100个模板，GPT Image 2 Prompt Updater节点支持自动更新opennano的gpt提示词模板
-20260430-新增10个提示词模板（含图片）
+20260430-2-增加GPT Image 2 Prompt Preview分类功能，新增100个模板，GPT Image 2 Prompt Updater节点支持自动更新opennano的gpt提示词模板 20260430-新增10个提示词模板（含图片）
 
+20260430-1-增加10个提示词模板
 
 ## ✨ 功能特性
 
@@ -146,8 +175,8 @@
 
 ```bash
 cd ComfyUI/custom_nodes/
-git https://github.com/T8mars/comfyui-gpt-image2-prompt-T8
-cd comfyui-gpt-image2-prompt-T8/
+git clone https://github.com/EvoLinkAI/awesome-gpt-image-2-prompts.git
+cd awesome-gpt-image-2-prompts/comfyui-gpt-image2-prompt/
 python build_local_prompts.py
 ```
 
@@ -160,7 +189,7 @@ python build_local_prompts.py
 安装完成后，运行数据构建脚本生成本地提示词数据库：
 
 ```bash
-cd ComfyUI/custom_nodes/comfyui-gpt-image2-prompt-t8/
+cd ComfyUI/custom_nodes/awesome-gpt-image-2-prompts/comfyui-gpt-image2-prompt/
 python build_local_prompts.py
 ```
 
@@ -178,7 +207,7 @@ python build_local_prompts.py
 ## 📁 目录结构
 
 ```
-comfyui-gpt-image2-prompt-t8/
+comfyui-gpt-image2-prompt/
 ├── __init__.py              # ComfyUI 入口文件
 ├── nodes.py                 # 5 个节点类定义
 ├── api_routes.py            # HTTP API 路由（图片服务、刷新等）
@@ -197,6 +226,24 @@ comfyui-gpt-image2-prompt-t8/
         ├── custom_prompts.json
         └── *.jpg            # 自定义预览图
 ```
+
+---
+
+## 📡 API 接口
+
+插件在 ComfyUI 服务器上注册了以下 HTTP API 接口：
+
+| 接口路径 | 方法 | 说明 |
+|----------|------|------|
+| `/gpt_image2_prompt/prompts` | GET | 获取所有提示词（预设 + 自定义） |
+| `/gpt_image2_prompt/choices_by_category` | GET | 按分类分组的提示词选项 |
+| `/gpt_image2_prompt/refresh_choices` | GET | 获取最新选项和分类（热刷新） |
+| `/gpt_image2_prompt/resolve_selection` | GET | 解析选择字符串为完整提示词数据 |
+| `/gpt_image2_prompt/image?path=...` | GET | 提供本地预览图文件服务 |
+| `/gpt_image2_prompt/categories` | GET | 分类列表及数量统计 |
+| `/gpt_image2_prompt/status` | GET | 插件状态信息 |
+| `/gpt_image2_prompt/delete_custom/{index}` | POST | 删除指定自定义提示词 |
+| `/gpt_image2_prompt/debug_image?path=...` | GET | 调试图片路径解析 |
 
 ---
 
