@@ -8,6 +8,7 @@
 
 ## 更新日志
 
+20260430-2-增加GPT Image 2 Prompt Preview分类功能，新增100个模板，GPT Image 2 Prompt Updater节点支持自动更新opennano的gpt提示词模板
 20260430-新增10个提示词模板（含图片）
 
 

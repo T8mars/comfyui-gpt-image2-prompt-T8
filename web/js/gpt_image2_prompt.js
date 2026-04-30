@@ -493,7 +493,8 @@ app.registerExtension({
                     refreshBtn.textContent = "⏳ Refreshing...";
                     refreshBtn.style.background = "#555";
                     const comboW = node.widgets?.find(w => w.name === "prompt_selection");
-                    const ok = await refreshNodeChoices(node, comboW, null);
+                    const catW = node.widgets?.find(w => w.name === "category");
+                    const ok = await refreshNodeChoices(node, comboW, catW);
                     refreshBtn.textContent = ok ? "✅ Refreshed!" : "❌ Failed";
                     refreshBtn.style.background = ok ? "#2d5a27" : "#5a2727";
                     setTimeout(() => {
@@ -511,17 +512,48 @@ app.registerExtension({
                 );
                 refreshWidget.serializeValue = async () => undefined;
 
-                // --- Real-time preview: hook combo widget ---
+                // --- Real-time preview: hook combo widget + category ---
                 let setupAttempts = 0;
                 const setupWidgets = async () => {
                     setupAttempts++;
+                    const categoryWidget = node.widgets?.find(w => w.name === "category");
                     const comboWidget = node.widgets?.find(w => w.name === "prompt_selection");
                     if (!comboWidget) {
                         if (setupAttempts < 20) setTimeout(setupWidgets, 200);
                         return;
                     }
 
-                    // Hook callback
+                    // Save full choices list
+                    node._allComboValues = [...(comboWidget.options?.values || [])];
+
+                    // Fetch category-grouped choices from API
+                    const grouped = await fetchChoicesByCategory();
+                    if (grouped) {
+                        node._choicesByCategory = grouped;
+                    }
+
+                    // === Hook category widget: callback + value polling ===
+                    if (categoryWidget) {
+                        const origCatCb = categoryWidget.callback;
+                        categoryWidget.callback = function (value) {
+                            if (origCatCb) origCatCb.call(this, value);
+                            node._filterByCategory(value, comboWidget);
+                        };
+
+                        let lastCatValue = categoryWidget.value;
+                        const pollCategory = () => {
+                            if (!node.graph) return;
+                            const current = categoryWidget.value;
+                            if (current !== lastCatValue) {
+                                lastCatValue = current;
+                                node._filterByCategory(current, comboWidget);
+                            }
+                            requestAnimationFrame(pollCategory);
+                        };
+                        requestAnimationFrame(pollCategory);
+                    }
+
+                    // Hook combo callback
                     const origCb = comboWidget.callback;
                     comboWidget.callback = function (value) {
                         if (origCb) origCb.call(this, value);
@@ -541,6 +573,12 @@ app.registerExtension({
                     };
                     requestAnimationFrame(poll);
 
+                    // Apply initial filter if category is not "all"
+                    const currentCat = categoryWidget?.value || "all";
+                    if (currentCat !== "all") {
+                        node._filterByCategory(currentCat, comboWidget);
+                    }
+
                     // Auto-preview initial selection
                     if (comboWidget.value) {
                         setTimeout(() => node._resolvePreview(comboWidget.value), 300);
@@ -548,7 +586,36 @@ app.registerExtension({
                 };
                 setTimeout(setupWidgets, 150);
 
-                node.setSize([400, 500]);
+                node.setSize([400, 550]);
+            };
+
+            /**
+             * Filter prompt_selection combo widget by category.
+             */
+            nodeType.prototype._filterByCategory = function (category, comboWidget) {
+                if (!comboWidget) return;
+
+                let filteredValues;
+
+                if (category === "all") {
+                    filteredValues = this._allComboValues || [];
+                } else if (this._choicesByCategory && this._choicesByCategory[category]) {
+                    filteredValues = this._choicesByCategory[category].map(c => c.value);
+                } else {
+                    filteredValues = (this._allComboValues || []).filter(choice => {
+                        if (category === "custom") return choice.startsWith("[custom_");
+                        return choice.includes(`[${category}]`);
+                    });
+                }
+
+                if (filteredValues.length === 0) {
+                    filteredValues = ["No prompts in this category"];
+                }
+
+                comboWidget.options.values = filteredValues;
+                comboWidget.value = filteredValues[0];
+                this._resolvePreview(filteredValues[0]);
+                this.setDirtyCanvas(true, true);
             };
 
             /**
