@@ -143,6 +143,28 @@
     "source": "README.md"
   },
   {
+    "id": "character_case14",
+    "category": "character",
+    "case_num": 14,
+    "title": "Character key visual poster with silhouette collage",
+    "author": "SimplyAnnisa",
+    "text": "A character promotional poster titled “INPUT NAME,” designed in a unified vertical key visual composition (9:16). The upper half features the most recognizable element of the character as a dominant oversized visual silhouette. The middle to lower section contains the full character as a secondary subject. Inside the large silhouette and around the character, use a double-exposure and collage-style narrative composition with scenes, symbolic imagery, supporting elements, and environmental details blended into mist, ink wash, and negative space. The left and right sides include complementary secondary elements to create narrative tension and spatial variation. A continuous flowing visual line runs from top to bottom, connecting the main character, internal collage, and the large upper silhouette. Preserve large areas of negative space with ink diffusion, soft blurring, and fragmented transitions inspired by Eastern aesthetics. The style is cohesive, refined, restrained, and poster-worthy.",
+    "image_path": "images/character_case14/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
+    "id": "character_case15",
+    "category": "character",
+    "case_num": 15,
+    "title": "Pixel game concept board from TV drama theme",
+    "author": "sciencedegens",
+    "text": "爱情公寓 电视剧主题 像素养成类游戏概念图，包括场景全局内容，周围环绕各人物形象三视图，底部是场景特写，右下角是剧情梗概。\n\n随机一个经典国内古装电视剧，生成古装电视剧主题像素养成类游戏概念图，包括场景全局内容，周围环绕各人物形象三视图，底部是场景特写，右下角是剧情梗概。\n\n「XXX」电视剧主题像素养成类游戏概念图，包括场景全局内容，周围环绕各人物（人物别重复）形象三视图，底部是场景特写，右下角是剧情梗概。",
+    "image_path": "images/character_case15/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
     "id": "comparison_case2",
     "category": "comparison",
     "case_num": 2,
@@ -790,6 +812,28 @@
     "image_path": "images/comparison_case75/output.jpg",
     "image_exists": true,
     "source": "README.md"
+  },
+  {
+    "id": "comparison_case76",
+    "category": "comparison",
+    "case_num": 76,
+    "title": "Miyazaki-style short film pipeline",
+    "author": "happycapyai",
+    "text": "Given a story concept, generate a complete Miyazaki-style animated short film: write a 30-shot script → generate watercolor storyboard images (gpt-image-1) → plan SOFT/HARD transitions → produce video clips with Seedance 2.0 using first/last-frame binding → synthesize the original ambient piano score → stitch everything into a final MP4 with music.",
+    "image_path": "images/comparison_case76/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
+    "id": "ecommerce_case163",
+    "category": "ecommerce",
+    "case_num": 163,
+    "title": "Burger hero image plus 9-cell ad storyboard",
+    "author": "Gdgtify",
+    "text": "Prompt 1: Create a cinematic hero image of a gourmet cheeseburger on a dark stone surface with glossy brioche bun, melted cheese, crisp lettuce, tomato, grilled patty, sauce, realistic texture, appetizing steam, warm side light, shallow depth of field, premium food commercial style, no text/logos/watermark.\n\nPrompt 2: Create a 9-cell hybrid keyframe-to-transition storyboard sheet for a 15-second gourmet burger ad, moving from empty surface to ingredient assembly to final macro hero shot. Use large S cells and smaller T cells, motion arrows, ghosted ingredient positions, steam, sauce trails, and camera push-in icons. Style: premium food commercial, warm lighting, rich texture, appetizing, cinematic, minimal labels only. No logos, no watermark.",
+    "image_path": "images/ecommerce_case163/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
   },
   {
     "id": "case_case69",
@@ -1459,6 +1503,28 @@
     "author": "harboriis",
     "text": "A cinematic nighttime photo of [your photo as reference] sitting alone at a wet bus\n\nstop bench, eating a burger. Rain-soaked street with orange bokeh city lights\n\nreflecting on the ground. Neon tube lights overhead. Red jacket, tan corduroy\n\npants. Moody, dark, atmospheric street photography.",
     "image_path": "images/portrait_case103/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
+    "id": "portrait_case104",
+    "category": "portrait",
+    "case_num": 104,
+    "title": "CCD flash beauty portrait template",
+    "author": "AIwithAliya",
+    "text": "A hyper-photorealistic shot of the same subject in the attached image, ultra-detailed facial features, visible pores, natural skin texture, rosy complexion and dewy skin, Douyin/Korean glass-skin makeup, glossy lips, aegyosal, baby pink blush, high identity consistency, realistic human anatomy. Use an old CCD digital camera aesthetic with direct flash, visible grain, slight overexposure, cool-neutral white balance, slight motion blur, and candid composition. Hair in a loose romantic updo; outfit in delicate off-shoulder silk with embroidered floral fabric; background of pastel floral bedding; horizontal close-up; shallow depth of field. Negative prompt: over-smoothed skin, plastic texture, unrealistic proportions, studio lighting, overly sharp HDR, stiff pose, artificial symmetry, over-retouched face.",
+    "image_path": "images/portrait_case104/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
+    "id": "portrait_case105",
+    "category": "portrait",
+    "case_num": 105,
+    "title": "Black-and-red streetwear campaign portrait",
+    "author": "harboriis",
+    "text": "Create a bold, high-contrast black and white portrait of a confident young man wearing a black leather jacket, facing slightly sideways with an intense expression. Use dramatic studio lighting with sharp shadows and detailed skin texture. Add strong red graphic elements over the image, including a horizontal red bar across the eyes, geometric shapes, thin lines, and framing boxes. Incorporate large bold typography, repeated faded text, and a motivational headline in bright red. The design should feel like a premium sports or streetwear campaign poster with a minimal textured grey background and black/white/grey/red palette only.",
+    "image_path": "images/portrait_case105/output.jpg",
     "image_exists": true,
     "source": "github_sync"
   },
@@ -2860,6 +2926,17 @@
     "source": "README.md"
   },
   {
+    "id": "poster_case163_1",
+    "category": "poster",
+    "case_num": 163,
+    "title": "Japanese Sci-Fi Suit-Up Process Board",
+    "author": "yy7482933910896",
+    "text": "{\"type\":\"Japanese sci-fi armor dressing-process infographic\",\"style\":\"cinematic live-action tokusatsu-inspired promotional board, realistic industrial lighting, polished metal surfaces, sharp photographic detail\",\"theme\":\"manual pre-battle suit-up sequence for a female hero in a red, silver, black, and blue protector suit\",\"subject\":{\"character\":{\"gender\":\"female\",\"age\":\"young adult\",\"identity\":\"helmetless heroine during assembly, face intentionally obscured or anonymized in every unhelmeted panel\",\"hair\":\"dark brown to black hair tied in a high ponytail with bangs\",\"undersuit\":\"glossy black skintight inner suit with silver chest panel and white neck ring\",\"armor\":\"retro-futuristic protector armor with red shoulder and arm plates, silver breastplate and torso plating, circular blue chest core, red waist unit, white gloves, red forearm guards with yellow stripe accents\",\"helmet\":\"round red-and-silver helmet with black visor\"},\"environment\":{\"location\":\"high-tech industrial hangar or armor bay\",\"background elements\":[\"metal framework\",\"robotic equipment\",\"tool benches\",\"armor racks\",\"computer monitors\",\"workshop lighting\",\"bay corridor marked BAY-07 in final panel\"]}},\"layout\":{\"header\":{\"count\":2,\"labels\":[\"ソルジャンヌ・スーツ 手動装着プロセス\",\"専用プロテクタースーツ『ソルジャンヌ』を、戦闘前に手動で装着する様子。各ユニットを確実に装着し、システムを起動する。\"],\"design\":\"wide black-to-red gradient banner across top, large bold white Japanese text, diagonal red accent\"},\"sections\":[{\"title\":\"1 インナースーツの確認\",\"position\":\"top-left\",\"count\":1,\"labels\":[\"各部のセンサーとコネクタをチェック。戦闘に備え、身体の状態を最終認する。\"],\"image\":\"three-quarter view of the heroine in only the black glossy inner suit, looking down while checking or tightening a wrist connector\"},{\"title\":\"2 胸部・肩部アーマーの装着\",\"position\":\"top-center\",\"count\":1,\"labels\":[\"胸部ユニットと肩部プロテクターを装着。コネクタを接続し、ロックを固定する。\"],\"image\":\"mid shot with chest armor and red shoulder plates installed, heroine fastening the front torso area with both hands\"},{\"title\":\"3 腰部ユニット・ベルトの固定\",\"position\":\"top-right\",\"count\":1,\"labels\":[\"ウエストユニットを装着し、各部のロックを確認。可動部の動作チェックを行う。\"],\"image\":\"mid shot with torso armor completed, heroine tightening or checking the waist belt and side locks\"},{\"title\":\"4 ヘルメットの準備\",\"position\":\"bottom-left\",\"count\":1,\"labels\":[\"ヘルメットのバイザーと内部システムをチェック。ヘッドセットとの同期を確認する。\"],\"image\":\"heroine holding the red helmet in both hands at chest height, showing the glossy black visor\"},{\"title\":\"5 ヘルメットの装着・システム起動\",\"position\":\"bottom-center\",\"count\":1,\"labels\":[\"ヘルメットを装着し、直上のコネクタをロック。全身のシステムが起動し、胸部コアが発光する。\"],\"image\":\"heroine placing the helmet onto her head with both hands; blue chest core glowing brightly\"},{\"title\":\"6 装着完了\",\"position\":\"bottom-right\",\"count\":1,\"labels\":[\"全システムの最終チェックを行い、戦闘モードへ。ソルジャンヌ、出撃準備完了!\"],\"image\":\"full-body frontal hero pose in a futuristic corridor, fully suited with helmet on, arms relaxed at sides\"}],\"footer\":{\"count\":1,\"labels\":[\"一つ一つの装着が、命を守り、力を引き出す。 ソルジャンヌの戦いは、ここから始まる。\"],\"design\":\"dark red cinematic footer strip with centered white Japanese slogan\"},\"grid\":{\"rows\":2,\"columns\":3,\"panel_count\":6,\"panel_borders\":\"thin white dividers\",\"number_badges\":6}},\"text_rendering\":{\"language\":\"Japanese\",\"font\":\"bold sans-serif headline with smaller sans-serif body text\",\"colors\":\"white text on black, red, and white info bars; red numbered squares with white numerals\"},\"composition\":\"16:9 wide infographic board, six equal photo panels arranged in a 3-by-2 grid, each panel captioned below with a red numbered box from 1 to 6\",\"lighting\":\"moody workshop lighting with metallic reflections and red accent lights, realistic shadows, cinematic sci-fi atmosphere\"}",
+    "image_path": "images/ecommerce_case163/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
     "id": "poster_case164",
     "category": "poster",
     "case_num": 164,
@@ -2966,6 +3043,39 @@
     "author": "LoovaAI",
     "text": "Use the character in image 1 as the main subject. Create a vertical poster ad in American fast food diner style. Low angle, wide lens. Red / yellow / white palette with ketchup splashes, melting cheese graphics, comic burst shapes, retro diner typography, and bold fast food poster collage aesthetic.",
     "image_path": "images/poster_case173/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
+    "id": "poster_case174",
+    "category": "poster",
+    "case_num": 174,
+    "title": "New York across two centuries cinematic poster",
+    "author": "Shinning1010",
+    "text": "Create a cinematic 3:4 vertical poster of New York City that feels truly epic and unconventional, showing the passage from the 20th century to the 21st century in one seamless image. Place a lone figure at the center of the composition, standing in the middle of the street and looking forward as if witnessing New York across time. The left side should depict 20th-century New York with warm sepia atmosphere, vintage taxis, old newsstands, retro lamps, and landmarks like the Chrysler Building and Empire State Building. The right side should depict 21st-century New York with glass skyscrapers, One World Trade Center, digital billboards, and modern urban energy. Make the transition natural rather than split-screen, with coherent perspective, wet reflective pavement, realistic textures, atmospheric depth, and no text.",
+    "image_path": "images/poster_case174/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
+    "id": "poster_case175",
+    "category": "poster",
+    "case_num": 175,
+    "title": "Blue Tears cocktail tutorial infographic poster",
+    "author": "cellinlab",
+    "text": "试着帮我生成调制一杯蓝色眼泪鸡尾酒（配料流程你自己发挥想象，但是要写清楚确保可复现）的流程教学图和概念设计宣传图，轻奢酒咖海报风格，横版。",
+    "image_path": "images/poster_case175/output.jpg",
+    "image_exists": true,
+    "source": "github_sync"
+  },
+  {
+    "id": "poster_case176",
+    "category": "poster",
+    "case_num": 176,
+    "title": "ASCII dengue infographic",
+    "author": "mapasbr",
+    "text": "infográfico ASCII DENGUE",
+    "image_path": "images/poster_case176/output.jpg",
     "image_exists": true,
     "source": "github_sync"
   },
