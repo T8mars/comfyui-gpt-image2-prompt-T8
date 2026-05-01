@@ -35,8 +35,11 @@ youtube教程：https://www.youtube.com/watch?v=oitmGaRtYvc
 ---
 ## ✨ 更新日志
 
+<<<<<<< HEAD
 20260501 新增多组提示词模板，优化GPT Image 2 Prompt Updater 节点自动更新模板逻辑
 
+=======
+>>>>>>> 3983a70f7e996154ef6835203c97116c9fa23dfc
 20260430-3-增加悬停显示预览图模式，由于提示词模板越来越多，目前可以在选择时候鼠标悬停划过都会显示对应预览图
 
 20260430-2-增加GPT Image 2 Prompt Preview分类功能，新增100个模板，GPT Image 2 Prompt Updater节点支持自动更新opennano的gpt提示词模板 20260430-新增10个提示词模板（含图片）
