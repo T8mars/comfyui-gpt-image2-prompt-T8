@@ -1,15 +1,20 @@
-# pyproject.toml
 [project]
-name = "comfyui-gpt-image2-prompt-T8" # Unique identifier for your node. Immutable after creation.
+name = "comfyui-gpt-image2-prompt-T8"
 description = "I love GoYounJung!Most Cheap API to my fans friedns!Bilibili:https://space.bilibili.com/385085361,website:https://ai.t8star.cn/register?aff=dP7j"
-version = "1.0.3" # Custom Node version. Must be semantically versioned.
-license = { file = "LICENSE.txt" }
-dependencies  = [] # Filled in from requirements.txt
+version = "1.1.0"
+license = {file = "LICENSE"} 
 
 [project.urls]
 Repository = "https://github.com/T8mars/comfyui-gpt-image2-prompt-T8"
+#  Used by Comfy Registry https://registry.comfy.org
+Documentation = "https://github.com/T8mars/Comfyui-zhenzhen/wiki"
+"Bug Tracker" = "https://github.com/T8mars/Comfyui-zhenzhen/issues"
 
+[tool]
 [tool.comfy]
-PublisherId = "T8star" # TODO (fill in Publisher ID from Comfy Registry Website).
-DisplayName = "comfyui-gpt-image2-prompt-T8" # Display name for the Custom Node. Can be changed later.
-Icon = "https://avatars.githubusercontent.com/u/96167788" # SVG, PNG, JPG or GIF (MAX. 800x400px)
+PublisherId = "t8star"
+DisplayName = "comfyui-gpt-image2-prompt-T8"
+Icon = "https://avatars.githubusercontent.com/u/96167788"
+includes = [] 
+# "requires-comfyui" = ">=1.0.0"  # ComfyUI version compatibility
+
