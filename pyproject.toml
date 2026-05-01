@@ -2,7 +2,7 @@
 [project]
 name = "comfyui-gpt-image2-prompt-T8" # Unique identifier for your node. Immutable after creation.
 description = "I love GoYounJung!Most Cheap API to my fans friedns!Bilibili:https://space.bilibili.com/385085361,website:https://ai.t8star.cn/register?aff=dP7j"
-version = "1.0.2" # Custom Node version. Must be semantically versioned.
+version = "1.0.3" # Custom Node version. Must be semantically versioned.
 license = { file = "LICENSE.txt" }
 dependencies  = [] # Filled in from requirements.txt
 
