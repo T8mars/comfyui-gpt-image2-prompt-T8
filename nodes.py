@@ -246,10 +246,15 @@ class GPTImage2PromptUpdater:
                 "rebuild_from_readme": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
                 "git_pull_first": ("BOOLEAN", {"default": False, "label_on": "Yes", "label_off": "No"}),
                 "sync_opennana": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
         }
 
-    def update_prompts(self, rebuild_from_readme, git_pull_first, sync_opennana=True):
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("nan")
+
+    def update_prompts(self, rebuild_from_readme, git_pull_first, sync_opennana=True, seed=0):
         import subprocess
         import sys
 

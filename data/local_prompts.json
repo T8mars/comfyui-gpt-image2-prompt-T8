@@ -4717,5 +4717,16 @@
     "image_path": "images/opennana_glass_skin_girl_sunset_glow/output.jpg",
     "image_exists": true,
     "source": "opennana.com/glass-skin-girl-sunset-glow"
+  },
+  {
+    "id": "opennana_8",
+    "category": "portrait",
+    "case_num": 0,
+    "title": "刺绣插图风格",
+    "author": "Artedeingenio",
+    "text": "A handcrafted illustration that simulates traditional embroidery using colorful threads on linen fabric. All elements are “stitched” with visible yarn textures, using techniques like satin stitch, backstitch, and French knots. Raised contours and directional thread flow create a tactile, cozy appearance. The background is made of woven linen, with gentle pastel or folk-inspired colors. The composition is friendly and magical, evoking a storybook charm. Include decorative details such as flowers, suns, clouds, trees or symbols to enhance the folk embroidery style.",
+    "image_path": "images/opennana_8/output.png",
+    "image_exists": true,
+    "source": "opennana.com/8"
   }
 ]

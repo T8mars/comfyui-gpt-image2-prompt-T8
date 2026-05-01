@@ -16,12 +16,14 @@ comfyui-gpt-image2-prompt/          ← NODE_DIR（节点根目录）
 ├── nodes.py                        ← 5 个节点类定义（Python 后端）
 ├── api_routes.py                   ← aiohttp 路由（图片服务 / 数据查询 / 刷新 API）
 ├── build_local_prompts.py          ← 数据构建脚本（解析 README → JSON + 复制图片）
-├── web/js/gpt_image2_prompt.js     ← 前端 LiteGraph 扩展（预览图 / 分类筛选 / 刷新按钮）
+├── fetch_opennana.py               ← OpenNana 数据源抓取脚本（sitemap 增量同步）
+├── web/js/gpt_image2_prompt.js     ← 前端 LiteGraph 扩展（预览图 / 分类筛选 / 刷新按钮 / 悬停预览）
 ├── data/
 │   ├── local_prompts.json          ← 预设提示词数据（由 build 脚本生成）
 │   ├── images/                     ← 本地图片副本（自包含）
 │   │   ├── portrait_case1/output.jpg
 │   │   ├── poster_case1/output.jpg
+│   │   ├── opennana_*/output.jpg
 │   │   └── ...
 │   ├── custom_prompts/
 │   │   ├── custom_prompts.json     ← 用户自定义模板
@@ -38,6 +40,7 @@ comfyui-gpt-image2-prompt/          ← NODE_DIR（节点根目录）
 | **完全自包含** | 节点运行时不依赖仓库根目录，所有资源在 `NODE_DIR/data/` 内 |
 | **本地图片** | 禁止运行时在线加载图片，全部从本地文件系统提供 |
 | **三层数据获取** | README 解析 → images/ 目录扫描 → git 历史恢复，确保覆盖最大化 |
+| **多数据源同步** | GitHub 仓库 + opennana.com sitemap，增量同步互不干扰 |
 | **安全覆写保护** | rebuild 结果为 0 或大幅减少时拒绝覆盖已有数据 |
 | **热刷新** | 保存新模板后无需重启 ComfyUI 即可在 Selector/Preview 节点看到 |
 
@@ -47,7 +50,7 @@ comfyui-gpt-image2-prompt/          ← NODE_DIR（节点根目录）
 |------|------|--------|
 | **Prompt Selector** 🎨 | 选择预设提示词 + 分类筛选 + 本地预览图 + 可编辑输出 | `OUTPUT_NODE = True`，返回 `{"ui": ..., "result": ...}` |
 | **Prompt Preview** 🖼️ | 纯预览节点，显示提示词文本 + 图片 | 前端实时预览（combo callback + polling） |
-| **Prompt Updater** 🔄 | 从 GitHub pull + 重新构建本地数据 | 调用 `build_local_prompts.py` 子进程 |
+| **Prompt Updater** 🔄 | GitHub pull + 重建 + OpenNana 同步 | 三步顺序执行，sync_opennana 默认开启 |
 | **Custom Prompt Saver** 💾 | 保存用户自定义提示词 + 预览图 | 支持重名覆盖、IMAGE tensor → JPEG 转换 |
 | **Execution Checker** ✅ | 健康检查（数据完整性 / 网络可达性） | 返回 `(STRING, BOOLEAN)` 双输出 |
 
@@ -675,3 +678,226 @@ return web.FileResponse(file_path, headers={"Content-Type": "image/jpeg"})
 8. **路径兼容**：同时支持开发环境（子目录）和用户安装环境（直接在 custom_nodes 下）
 9. **README 解析**：不能假设 README 文件就是源数据 README，要做内容检查
 10. **降级策略**：本地没有源文件 → 从 GitHub 下载 → git 历史恢复，多级降级确保可用性
+
+---
+
+## 九、OpenNana 多数据源同步
+
+### 9.1 架构设计
+
+`fetch_opennana.py` 实现从 opennana.com 增量抓取提示词模板：
+
+```
+Updater 执行顺序：
+  1. git pull（可选）
+  2. rebuild_from_readme（重建本地 JSON）
+  3. sync_opennana（检查 opennana.com 新模板）  ← 新增
+  4. 统计汇总
+```
+
+### 9.2 核心函数
+
+```python
+# 可被 import 调用的同步函数
+def sync_from_opennana(targets=None, dry_run=False, delay=1.0):
+    """
+    targets: slug 列表，None 则自动从 sitemap 获取全部
+    返回: {added, skipped, failed, old_count, new_count, message}
+    """
+```
+
+### 9.3 sitemap 发现机制
+
+```python
+OPENNANA_SITEMAP = "https://opennana.com/sitemap.xml"
+GALLERY_PREFIX = "https://opennana.com/awesome-prompt-gallery/"
+
+def fetch_sitemap_slugs():
+    xml = _fetch_page(OPENNANA_SITEMAP)
+    all_locs = re.findall(r'<loc>(...gallery/[^<]+)</loc>', xml)
+    slugs = [loc.replace(GALLERY_PREFIX, "").strip("/") for loc in all_locs]
+    return slugs  # e.g. ["korean-street-ootd", "playful-doodle-overlay", ...]
+```
+
+### 9.4 页面解析策略
+
+| 字段 | 提取方式 |
+|------|----------|
+| 标题 | `<h1>` → `<title>` → `og:title` meta |
+| 作者 | 正则 `来源.*?@(\w+)` |
+| 提示词 | ` ``` ` 代码块中 > 20 字符的文本 |
+| 图片 | `og:image` meta → `img.opennana.com/prompts/images/` URL |
+| 标签 | `<meta name="keywords">` |
+
+### 9.5 双层分类映射
+
+标签为空（opennana 常见情况）时，回退到基于 slug 关键词的分类：
+
+```python
+# 第一层：标签映射
+TAG_CATEGORY_MAP = {"portrait": "portrait", "anime": "character", ...}
+
+# 第二层：slug 关键词回退
+SLUG_CATEGORY_RULES = [
+    ("portrait", ["selfie", "girl", "woman", "beauty", "blonde", ...]),
+    ("character", ["anime", "3d_cartoon", "emoji_sticker", ...]),
+    ("poster", ["poster", "blueprint", "infographic", ...]),
+    ("ecommerce", ["product", "soda", "perfume", ...]),
+]
+
+def _infer_category(tags, slug=""):
+    for tag in tags:
+        if tag in TAG_CATEGORY_MAP: return TAG_CATEGORY_MAP[tag]
+    # 回退到 slug 关键词
+    for cat, keywords in SLUG_CATEGORY_RULES:
+        for kw in keywords:
+            if kw in slug.lower(): return cat
+    return "portrait"  # 默认
+```
+
+### 9.6 entry_id 生成规则
+
+```python
+# slug 格式: "korean-street-ootd" → "opennana_korean_street_ootd"
+entry_id = f"opennana_{slug.replace('-', '_')}"
+# 数字格式: 515 → "opennana_prompt_515"
+```
+
+### 9.7 Updater 节点集成
+
+```python
+# nodes.py - INPUT_TYPES 新增选项
+"sync_opennana": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
+
+# update_prompts() 中调用
+if sync_opennana:
+    from fetch_opennana import sync_from_opennana
+    result = sync_from_opennana(targets=None, dry_run=False, delay=1.0)
+    status_parts.append(result["message"])
+```
+
+注意 import 容错：先尝试直接 `from fetch_opennana import`，失败则用 `importlib.util.spec_from_file_location` 按绝对路径加载。
+
+---
+
+## 十、下拉列表悬停预览窗口
+
+### 10.1 需求
+
+用户打开 prompt_selection 下拉列表时，鼠标划过每一项，在列表右侧弹出浮动预览窗口显示该条目的预览图和标题，方便快速浏览选择。
+
+### 10.2 技术方案
+
+```
+检测下拉菜单出现（MutationObserver）
+  → 识别是否为 prompt 下拉（检查 [preset_ / [custom_ 前缀）
+  → 事件委托 mouseover/mouseout
+  → 调用 resolve_selection API 获取图片
+  → 浮动面板定位显示
+```
+
+### 10.3 浮动面板设计
+
+```javascript
+// 单例面板，position: fixed，pointer-events: none（不干扰点击选择）
+const panel = document.createElement("div");
+panel.style.cssText = [
+    "position: fixed",
+    "z-index: 100000",       // 确保在所有 UI 之上
+    "pointer-events: none",  // 关键：不拦截鼠标事件
+    "box-shadow: 0 4px 24px rgba(0,0,0,0.7)",
+].join(";");
+```
+
+### 10.4 下拉菜单检测（MutationObserver）
+
+ComfyUI 的 combo widget 下拉菜单是动态创建的 DOM 元素，需要监听 body 子节点变化：
+
+```javascript
+const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+        for (const added of mutation.addedNodes) {
+            if (added.nodeType !== 1) continue;
+            // LiteGraph 经典下拉: .litecontextmenu > .litemenu-entry
+            // 新版 ComfyUI: [role='listbox'] > [role='option']
+            // 通过条目内容 [preset_ / [custom_ 判断是否为我们的下拉
+        }
+    }
+});
+observer.observe(document.body, { childList: true, subtree: true });
+```
+
+### 10.5 事件委托（性能关键）
+
+400+ 条目不能逐个绑定事件，必须使用事件委托：
+
+```javascript
+// 在菜单容器上监听 mouseover，而非每个条目
+menuEl.addEventListener("mouseover", (e) => {
+    const entry = e.target.closest(".litemenu-entry")
+        || e.target.closest("[role='option']");
+    if (!entry) return;
+    const text = entry.textContent?.trim();
+    if (!isPromptSelection(text)) return;
+    hoverPreview.show(menuRect.right, rect.top, text);
+});
+
+menuEl.addEventListener("mouseout", (e) => {
+    if (e.relatedTarget && menuEl.contains(e.relatedTarget)) return;
+    hoverPreview.hide();
+});
+```
+
+### 10.6 API 调用缓存
+
+```javascript
+const _hoverCache = {};
+// 80ms 防抖 + 缓存，同一条目只请求一次
+clearTimeout(fetchTimer);
+fetchTimer = setTimeout(async () => {
+    const resp = await api.fetchApi(`${RESOLVE_API}?selection=...`);
+    const data = await resp.json();
+    _hoverCache[selection] = data;
+}, 80);
+```
+
+### 10.7 定位算法
+
+```javascript
+// 默认显示在下拉列表右侧
+let left = menuRect.right + 12;
+let top = entryRect.top - 40;
+// 右侧空间不足时切到左侧
+if (left + 320 > window.innerWidth) left = menuRect.left - 320 - 12;
+// 垂直方向防止超出视口
+if (top + 360 > window.innerHeight) top = window.innerHeight - 370;
+if (top < 10) top = 10;
+```
+
+### 10.8 菜单移除检测
+
+下拉菜单关闭后需要隐藏预览面板：
+
+```javascript
+// 方式1：全局 pointerdown 事件
+document.addEventListener("pointerdown", () => {
+    setTimeout(() => hoverPreview.hide(), 100);
+}, true);
+
+// 方式2：MutationObserver 检测菜单 DOM 移除
+const mo = new MutationObserver(() => {
+    if (!menuEl.isConnected) { hoverPreview.hide(); mo.disconnect(); }
+});
+```
+
+---
+
+## 十一、关键经验总结（补充）
+
+11. **多数据源同步**：各数据源逻辑完全隔离，按顺序依次执行，一个失败不影响其他
+12. **sitemap 发现**：JS 渲染页面无法直接抓取内容列表，通过 sitemap.xml 获取所有页面 URL 是可靠的替代方案
+13. **标签为空的分类**：opennana 页面标签经常为空，必须有基于 slug/标题关键词的回退分类机制
+14. **import 容错**：ComfyUI 插件的 Python 模块 import 路径不确定，用 `importlib.util.spec_from_file_location` 作为备选
+15. **下拉悬停预览**：MutationObserver + 事件委托 + API 缓存是 LiteGraph combo widget 增强的标准模式
+16. **pointer-events: none**：浮动预览面板必须设置此属性，否则会拦截鼠标事件导致无法选择下拉项
+17. **增量同步**：`sync_from_opennana()` 先加载已有 ID 集合，快速跳过已存在条目，只抓取新增内容

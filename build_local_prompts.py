@@ -462,9 +462,10 @@ def _is_case_readme(filepath):
     """Check if a README file contains case definitions (### Case N:)."""
     try:
         with open(str(filepath), "r", encoding="utf-8") as f:
-            # Read first 5000 chars to check
-            head = f.read(5000)
-        return "### Case" in head or "## " in head and "Portrait" in head
+            # Read entire file to check (README may have cases far down)
+            content = f.read()
+        # Must contain actual ### Case N: pattern
+        return bool(re.search(r'###\s*Case\s+\d+:', content))
     except Exception:
         return False
 
@@ -499,7 +500,7 @@ def main():
                     readme_files.append(f)
 
     # If no case READMEs found locally, download from GitHub
-    if not readme_files:
+    if not readme_files and not readme_contents:
         print("  No local case README found, downloading from GitHub...")
         readme_names = ["README.md", "README_zh-CN.md", "README_de.md"]
         for rname in readme_names:
@@ -527,6 +528,21 @@ def main():
 
     readme_count = len(all_cases)
     print(f"  README total: {readme_count} cases")
+
+    # If README parsing yielded 0 cases, try downloading from GitHub as fallback
+    if readme_count == 0 and not readme_contents:
+        print("  No cases parsed locally, trying GitHub download as fallback...")
+        readme_names_dl = ["README.md", "README_zh-CN.md", "README_de.md"]
+        for rname in readme_names_dl:
+            content = _download_readme_from_github(rname)
+            if content:
+                cases = parse_single_readme(content, existing_image_paths)
+                if cases:
+                    print(f"  {rname} (downloaded): {len(cases)} new cases")
+                    all_cases.extend(cases)
+                    break
+        if all_cases:
+            print(f"  After GitHub fallback: {len(all_cases)} cases")
 
     # ========== Stage 2: Scan images/ directory for uncovered folders ==========
     print(f"\n[Stage 2] Scanning images/ directory for uncovered folders...")
@@ -596,15 +612,28 @@ def main():
     else:
         print(f"\n[Info] SRC_IMAGES_DIR not found, skipping coverage verification.")
 
+    # ========== Merge opennana entries from existing data ==========
+    # Preserve opennana_* entries that were added by fetch_opennana.py
+    existing_opennana = [p for p in existing_presets if p.get("id", "").startswith("opennana_")]
+    new_ids = {c["id"] for c in all_cases}
+    merged_opennana = [p for p in existing_opennana if p["id"] not in new_ids]
+    if merged_opennana:
+        print(f"\n[Merge] Preserving {len(merged_opennana)} opennana entries from existing data")
+        all_cases.extend(merged_opennana)
+
     # ========== Safety Check ==========
-    old_preset_count = len([p for p in existing_presets if not p.get("id", "").startswith("custom_")])
-    new_preset_count = len(all_cases)
-    if old_preset_count > 0 and new_preset_count == 0:
-        print(f"\n[SAFETY] Rebuild produced 0 entries but existing has {old_preset_count}. NOT overwriting!")
+    # Count only non-opennana, non-custom presets for safety comparison
+    old_preset_count = len([p for p in existing_presets
+                           if not p.get("id", "").startswith("custom_")
+                           and not p.get("id", "").startswith("opennana_")])
+    new_readme_count = len([c for c in all_cases
+                           if not c.get("id", "").startswith("opennana_")])
+    if old_preset_count > 0 and new_readme_count == 0:
+        print(f"\n[SAFETY] Rebuild produced 0 README entries but existing has {old_preset_count}. NOT overwriting!")
         print(f"  This usually means README source was not found. Check paths and network.")
         return
-    if old_preset_count > 50 and new_preset_count < old_preset_count * 0.5:
-        print(f"\n[SAFETY] New count ({new_preset_count}) is less than 50% of old ({old_preset_count}). NOT overwriting!")
+    if old_preset_count > 50 and new_readme_count < old_preset_count * 0.5:
+        print(f"\n[SAFETY] New count ({new_readme_count}) is less than 50% of old ({old_preset_count}). NOT overwriting!")
         print(f"  Pass --force to override this safety check.")
         import sys
         if "--force" not in sys.argv:
