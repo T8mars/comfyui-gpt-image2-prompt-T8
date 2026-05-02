@@ -10,19 +10,10 @@ import shutil
 from pathlib import Path
 
 NODE_DIR = Path(__file__).resolve().parent            # comfyui-gpt-image2-prompt/
-REPO_ROOT = NODE_DIR.parent                          # parent directory (may or may not be repo)
 
-# Source images: prefer NODE_DIR/images/ (self-contained install),
-# fallback to REPO_ROOT/images/ (dev/repo structure)
+# Source images: NODE_DIR/images/ (self-contained install)
 # Use os.path.isdir for reliable Windows path checking
-_SRC_IN_NODE = str(NODE_DIR / "images")
-_SRC_IN_REPO = str(REPO_ROOT / "images")
-if os.path.isdir(_SRC_IN_NODE):
-    SRC_IMAGES_DIR = _SRC_IN_NODE
-elif os.path.isdir(_SRC_IN_REPO):
-    SRC_IMAGES_DIR = _SRC_IN_REPO
-else:
-    SRC_IMAGES_DIR = _SRC_IN_NODE  # Will fail with clear error later
+SRC_IMAGES_DIR = str(NODE_DIR / "images")
 
 LOCAL_IMAGES_DIR = str(NODE_DIR / "data" / "images")  # Destination inside node dir
 OUTPUT_JSON = str(NODE_DIR / "data" / "local_prompts.json")
@@ -124,30 +115,30 @@ def parse_single_readme(readme_path, existing_image_paths):
                     j = k  # Skip past the closing ```
                 j += 1
 
-            # Accept case if we have image (prompt may be empty)
+            # Accept case if we have image path (prompt may be empty)
             if image_path and image_path not in existing_image_paths:
-                # Verify image exists locally
+                # Check if image exists locally (for status tracking)
                 img_exists = _check_image_exists(image_path)
-                if img_exists:
-                    # Infer category from image folder name if section is generic
-                    folder_name = image_path.split("/")[1] if "/" in image_path else ""
-                    if current_section == "other" and folder_name:
-                        inferred = _infer_category_from_folder(folder_name)
-                        if inferred != "other":
-                            current_section = inferred
 
-                    cases.append({
-                        "id": f"{current_section}_case{case_num}",
-                        "category": current_section,
-                        "case_num": int(case_num),
-                        "title": title[:200],
-                        "author": author,
-                        "text": prompt_text,
-                        "image_path": image_path,
-                        "image_exists": True,
-                        "source": source_name,
-                    })
-                    existing_image_paths.add(image_path)
+                # Infer category from image folder name if section is generic
+                folder_name = image_path.split("/")[1] if "/" in image_path else ""
+                if current_section == "other" and folder_name:
+                    inferred = _infer_category_from_folder(folder_name)
+                    if inferred != "other":
+                        current_section = inferred
+
+                cases.append({
+                    "id": f"{current_section}_case{case_num}",
+                    "category": current_section,
+                    "case_num": int(case_num),
+                    "title": title[:200],
+                    "author": author,
+                    "text": prompt_text,
+                    "image_path": image_path,
+                    "image_exists": img_exists,
+                    "source": source_name,
+                })
+                existing_image_paths.add(image_path)
 
         i += 1
 
@@ -155,12 +146,10 @@ def parse_single_readme(readme_path, existing_image_paths):
 
 
 def _check_image_exists(image_rel_path):
-    """Check if an image exists in any known location."""
-    # Try SRC_IMAGES_DIR parent (e.g. REPO_ROOT/images/xxx or NODE_DIR/images/xxx)
+    """Check if an image exists in any known location within NODE_DIR."""
     candidates = [
         os.path.join(SRC_IMAGES_DIR, os.sep.join(image_rel_path.split("/")[1:])),  # images/xxx -> SRC/xxx
         os.path.join(str(NODE_DIR), image_rel_path.replace("/", os.sep)),
-        os.path.join(str(REPO_ROOT), image_rel_path.replace("/", os.sep)),
         os.path.join(LOCAL_IMAGES_DIR, os.sep.join(image_rel_path.split("/")[1:])),  # Already in data/images/
     ]
     for p in candidates:
@@ -218,15 +207,30 @@ def _build_md5_map():
     return md5_map
 
 
+def _list_github_image_folders():
+    """List image folders from GitHub API (when local images/ doesn't exist)."""
+    import urllib.request
+    url = "https://api.github.com/repos/EvoLinkAI/awesome-gpt-image-2-prompts/contents/images"
+    try:
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "ComfyUI-GPTImage2Prompt/1.0",
+            "Accept": "application/vnd.github.v3+json",
+        })
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            import json as _json
+            items = _json.loads(resp.read().decode("utf-8"))
+        folders = [item["name"] for item in items if item["type"] == "dir"]
+        return folders
+    except Exception as e:
+        print(f"  [Warning] GitHub API listing failed: {e}")
+        return []
+
+
 def scan_images_directory(existing_image_paths):
     """Scan images/ directory for any folders not yet covered.
     Creates entries for uncovered folders (image-only, no prompt text from README).
-    Automatically skips folders that are duplicates of already-covered folders.
+    If local images/ doesn't exist, queries GitHub API for folder list.
     """
-    if not os.path.isdir(SRC_IMAGES_DIR):
-        print(f"  [Warning] SRC_IMAGES_DIR does not exist: {SRC_IMAGES_DIR}")
-        return []
-
     cases = []
     covered_folders = set()
     for img_path in existing_image_paths:
@@ -234,36 +238,36 @@ def scan_images_directory(existing_image_paths):
         if len(parts) >= 2:
             covered_folders.add(parts[1])
 
-    # Build MD5 map to detect duplicate image folders
-    md5_map = _build_md5_map()
-    # Build reverse map: folder -> hash
-    folder_hash = {}
-    for h, folders in md5_map.items():
-        for f in folders:
-            folder_hash[f] = h
+    # Get folder list: local or from GitHub API
+    if os.path.isdir(SRC_IMAGES_DIR):
+        all_folders = sorted(os.listdir(SRC_IMAGES_DIR))
+        source = "local"
+    else:
+        print(f"  Local images/ not found, querying GitHub API...")
+        all_folders = _list_github_image_folders()
+        source = "github"
 
-    for folder_name in sorted(os.listdir(SRC_IMAGES_DIR)):
-        folder_path = os.path.join(SRC_IMAGES_DIR, folder_name)
-        if not os.path.isdir(folder_path) or folder_name in covered_folders:
+    for folder_name in sorted(all_folders):
+        if folder_name in covered_folders:
             continue
 
-        # Skip non-case folders (like 'logo.png' file or special dirs)
+        # Skip non-case folders
         if folder_name.startswith("."):
             continue
 
-        # Find an image file in this folder
-        img_file = _find_best_image(folder_path)
-        if not img_file:
-            continue
-
-        # Skip if this folder's image is a duplicate of an already-covered folder
-        h = folder_hash.get(folder_name)
-        if h:
-            same_hash_folders = md5_map.get(h, [])
-            if any(f in covered_folders for f in same_hash_folders):
+        # For local: verify folder has an image
+        if source == "local":
+            folder_path = os.path.join(SRC_IMAGES_DIR, folder_name)
+            if not os.path.isdir(folder_path):
                 continue
+            img_file = _find_best_image(folder_path)
+            if not img_file:
+                continue
+            image_path = f"images/{folder_name}/{img_file}"
+        else:
+            # For GitHub: assume output.jpg exists (will be downloaded in Stage 4)
+            image_path = f"images/{folder_name}/output.jpg"
 
-        image_path = f"images/{folder_name}/{img_file}"
         category = _infer_category_from_folder(folder_name)
 
         # Extract case number from folder name if possible
@@ -281,8 +285,8 @@ def scan_images_directory(existing_image_paths):
             "author": "",
             "text": "",  # No prompt text available
             "image_path": image_path,
-            "image_exists": True,
-            "source": "images_directory",
+            "image_exists": False,  # Will be resolved in Stage 4
+            "source": f"images_directory_{source}",
         })
         existing_image_paths.add(image_path)
 
@@ -313,17 +317,15 @@ def _recover_from_git_history(empty_cases):
 
     print(f"    Looking for {len(folder_map)} missing prompts in git history...")
 
-    # Determine git working directory (could be NODE_DIR or REPO_ROOT)
+    # Determine git working directory (NODE_DIR only)
     git_cwd = None
-    for candidate in [NODE_DIR, REPO_ROOT]:
-        try:
-            r = subprocess.run(["git", "rev-parse", "--git-dir"],
-                             cwd=str(candidate), capture_output=True, text=True, timeout=5)
-            if r.returncode == 0:
-                git_cwd = str(candidate)
-                break
-        except Exception:
-            continue
+    try:
+        r = subprocess.run(["git", "rev-parse", "--git-dir"],
+                         cwd=str(NODE_DIR), capture_output=True, text=True, timeout=5)
+        if r.returncode == 0:
+            git_cwd = str(NODE_DIR)
+    except Exception:
+        pass
     if not git_cwd:
         print("    No git repository found, skipping git history recovery")
         return 0
@@ -470,6 +472,28 @@ def _is_case_readme(filepath):
         return False
 
 
+def _download_image_from_github(image_rel_path, dst_path):
+    """Download an image from GitHub raw when not available locally.
+    image_rel_path: e.g. 'images/portrait_case1/output.jpg'
+    dst_path: absolute path to save the image
+    Returns True on success.
+    """
+    import urllib.request
+    url = f"{GITHUB_RAW_BASE}/{image_rel_path}"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = resp.read()
+        if len(data) < 100:  # Too small, probably an error page
+            return False
+        os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+        with open(dst_path, "wb") as f:
+            f.write(data)
+        return True
+    except Exception:
+        return False
+
+
 def main():
     print(f"[Config] NODE_DIR = {NODE_DIR}")
     print(f"[Config] SRC_IMAGES_DIR = {SRC_IMAGES_DIR} (exists={os.path.isdir(SRC_IMAGES_DIR)})")
@@ -484,32 +508,27 @@ def main():
         except Exception:
             pass
 
-    # ========== Stage 1: Parse all README files ==========
-    readme_files = []  # List of Path objects
-    readme_contents = []  # List of (source_name, content_string) for downloaded READMEs
+    # ========== Stage 1: Download & parse latest README from GitHub ==========
+    readme_contents = []  # List of (source_name, content_string)
+    readme_files = []     # List of Path objects (local)
 
-    # Look for case READMEs locally (NODE_DIR first, then REPO_ROOT)
-    for search_dir in [NODE_DIR, REPO_ROOT]:
+    # Always download from GitHub to get the latest version
+    print("[Stage 1] Downloading latest README from GitHub...")
+    readme_names = ["README.md", "README_zh-CN.md", "README_de.md"]
+    for rname in readme_names:
+        content = _download_readme_from_github(rname)
+        if content:
+            readme_contents.append((rname, content))
+            break  # One good README is enough
+
+    # Also check local README in NODE_DIR (may have more cases)
+    for search_dir in [NODE_DIR]:
         main_readme = search_dir / "README.md"
         if os.path.isfile(str(main_readme)) and _is_case_readme(str(main_readme)):
-            if main_readme not in readme_files:
-                readme_files.append(main_readme)
-        for f in sorted(Path(str(search_dir)).glob("README_*.md")):
-            if os.path.isfile(str(f)) and _is_case_readme(str(f)):
-                if f not in readme_files:
-                    readme_files.append(f)
+            readme_files.append(main_readme)
+            break
 
-    # If no case READMEs found locally, download from GitHub
-    if not readme_files and not readme_contents:
-        print("  No local case README found, downloading from GitHub...")
-        readme_names = ["README.md", "README_zh-CN.md", "README_de.md"]
-        for rname in readme_names:
-            content = _download_readme_from_github(rname)
-            if content:
-                readme_contents.append((rname, content))
-                break  # One good README is enough
-
-    print(f"[Stage 1] Parsing {len(readme_files) + len(readme_contents)} README files...")
+    print(f"  Parsing {len(readme_files) + len(readme_contents)} README sources...")
 
     all_cases = []
     existing_image_paths = set()
@@ -528,21 +547,6 @@ def main():
 
     readme_count = len(all_cases)
     print(f"  README total: {readme_count} cases")
-
-    # If README parsing yielded 0 cases, try downloading from GitHub as fallback
-    if readme_count == 0 and not readme_contents:
-        print("  No cases parsed locally, trying GitHub download as fallback...")
-        readme_names_dl = ["README.md", "README_zh-CN.md", "README_de.md"]
-        for rname in readme_names_dl:
-            content = _download_readme_from_github(rname)
-            if content:
-                cases = parse_single_readme(content, existing_image_paths)
-                if cases:
-                    print(f"  {rname} (downloaded): {len(cases)} new cases")
-                    all_cases.extend(cases)
-                    break
-        if all_cases:
-            print(f"  After GitHub fallback: {len(all_cases)} cases")
 
     # ========== Stage 2: Scan images/ directory for uncovered folders ==========
     print(f"\n[Stage 2] Scanning images/ directory for uncovered folders...")
@@ -612,29 +616,54 @@ def main():
     else:
         print(f"\n[Info] SRC_IMAGES_DIR not found, skipping coverage verification.")
 
-    # ========== Merge opennana entries from existing data ==========
-    # Preserve opennana_* entries that were added by fetch_opennana.py
-    existing_opennana = [p for p in existing_presets if p.get("id", "").startswith("opennana_")]
-    new_ids = {c["id"] for c in all_cases}
-    merged_opennana = [p for p in existing_opennana if p["id"] not in new_ids]
-    if merged_opennana:
-        print(f"\n[Merge] Preserving {len(merged_opennana)} opennana entries from existing data")
-        all_cases.extend(merged_opennana)
+    # ========== Incremental Merge with existing data ==========
+    # Strategy: keep all existing entries, add new ones, update text if GitHub has better data
+    existing_by_id = {p["id"]: p for p in existing_presets}
+    new_added = 0
+    text_updated = 0
+
+    final_entries = []
+    processed_ids = set()
+
+    # First: process all newly discovered cases
+    for c in all_cases:
+        cid = c["id"]
+        if cid in processed_ids:
+            continue
+        processed_ids.add(cid)
+
+        old_entry = existing_by_id.get(cid)
+        if old_entry:
+            # Entry exists - merge: keep old, update text if new has better data
+            merged = dict(old_entry)
+            if c.get("text", "").strip() and not old_entry.get("text", "").strip():
+                merged["text"] = c["text"]
+                text_updated += 1
+            final_entries.append(merged)
+        else:
+            # New entry from GitHub
+            final_entries.append(c)
+            new_added += 1
+
+    # Second: keep existing entries not covered by new scan (shouldn't lose any)
+    for p in existing_presets:
+        if p["id"] not in processed_ids:
+            final_entries.append(p)
+            processed_ids.add(p["id"])
+
+    print(f"\n[Merge] Incremental update: {new_added} new entries added, {text_updated} texts updated")
+    print(f"  Total after merge: {len(final_entries)} entries")
+
+    all_cases = final_entries
 
     # ========== Safety Check ==========
-    # Count only non-opennana, non-custom presets for safety comparison
-    old_preset_count = len([p for p in existing_presets
-                           if not p.get("id", "").startswith("custom_")
-                           and not p.get("id", "").startswith("opennana_")])
-    new_readme_count = len([c for c in all_cases
-                           if not c.get("id", "").startswith("opennana_")])
-    if old_preset_count > 0 and new_readme_count == 0:
-        print(f"\n[SAFETY] Rebuild produced 0 README entries but existing has {old_preset_count}. NOT overwriting!")
-        print(f"  This usually means README source was not found. Check paths and network.")
+    old_total = len(existing_presets)
+    new_total = len(all_cases)
+    if old_total > 0 and new_total == 0:
+        print(f"\n[SAFETY] Merge produced 0 entries but existing has {old_total}. NOT overwriting!")
         return
-    if old_preset_count > 50 and new_readme_count < old_preset_count * 0.5:
-        print(f"\n[SAFETY] New count ({new_readme_count}) is less than 50% of old ({old_preset_count}). NOT overwriting!")
-        print(f"  Pass --force to override this safety check.")
+    if old_total > 50 and new_total < old_total * 0.5:
+        print(f"\n[SAFETY] New count ({new_total}) is less than 50% of old ({old_total}). NOT overwriting!")
         import sys
         if "--force" not in sys.argv:
             return
@@ -644,18 +673,31 @@ def main():
     os.makedirs(LOCAL_IMAGES_DIR, exist_ok=True)
     copied = 0
     skipped = 0
+    downloaded = 0
+    download_failed = 0
     for c in all_cases:
+        # Skip opennana entries (they manage their own images)
+        if c.get("id", "").startswith("opennana_"):
+            img_rel = c.get("image_path", "")
+            if img_rel:
+                dst_check = os.path.join(LOCAL_IMAGES_DIR,
+                    os.sep.join(img_rel.replace("/", os.sep).split(os.sep)[1:]) if os.sep in img_rel.replace("/", os.sep) else img_rel)
+                if os.path.isfile(dst_check):
+                    skipped += 1
+                    c["image_exists"] = True
+                    continue
+            continue
+
         img_rel = c["image_path"]  # e.g. "images/portrait_case1/output.jpg"
         img_parts = img_rel.replace("/", os.sep).split(os.sep)  # ["images", "portrait_case1", "output.jpg"]
         # Sub-path within images/ dir
         sub_path = os.sep.join(img_parts[1:]) if len(img_parts) > 1 else img_parts[0]
 
-        # Try multiple source locations
+        # Try multiple source locations (NODE_DIR only)
         src_path = None
         candidates = [
             os.path.join(SRC_IMAGES_DIR, sub_path),
             os.path.join(str(NODE_DIR), img_rel.replace("/", os.sep)),
-            os.path.join(str(REPO_ROOT), img_rel.replace("/", os.sep)),
         ]
         for candidate in candidates:
             if os.path.isfile(candidate):
@@ -677,8 +719,20 @@ def main():
                 skipped += 1
                 c["image_exists"] = True
             else:
-                c["image_exists"] = False
-    print(f"  Copied {copied} images, skipped {skipped} (already up to date)")
+                # Download from GitHub as last resort
+                if _download_image_from_github(img_rel, dst_path):
+                    downloaded += 1
+                    c["image_exists"] = True
+                else:
+                    download_failed += 1
+                    c["image_exists"] = False
+    msg_parts = [f"Copied {copied}"]
+    if downloaded:
+        msg_parts.append(f"downloaded {downloaded} from GitHub")
+    if download_failed:
+        msg_parts.append(f"{download_failed} download failed")
+    msg_parts.append(f"skipped {skipped} (already up to date)")
+    print(f"  {', '.join(msg_parts)}")
 
     # ========== Save ==========
     os.makedirs(os.path.dirname(OUTPUT_JSON), exist_ok=True)

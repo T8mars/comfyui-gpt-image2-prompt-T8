@@ -35,6 +35,8 @@ youtube教程：https://www.youtube.com/watch?v=oitmGaRtYvc
 ---
 ## ✨ 更新日志
 
+20260502 修复预览图不显示问题，重写updater节点的逻辑
+
 <<<<<<< HEAD
 20260501 新增多组提示词模板，优化GPT Image 2 Prompt Updater 节点自动更新模板逻辑
 

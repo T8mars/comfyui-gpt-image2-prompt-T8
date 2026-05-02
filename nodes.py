@@ -24,7 +24,7 @@ NODE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(NODE_DIR, "data")
 IMAGES_DIR = os.path.join(DATA_DIR, "images")        # Local images copied from repo
 IMAGE_BASE = DATA_DIR                                # Base dir for resolving image_path in JSON
-REPO_ROOT = os.path.dirname(NODE_DIR)                # Only used by Updater for git pull
+
 LOCAL_PROMPTS_JSON = os.path.join(DATA_DIR, "local_prompts.json")
 CUSTOM_PROMPTS_DIR = os.path.join(DATA_DIR, "custom_prompts")
 CUSTOM_PROMPTS_JSON = os.path.join(CUSTOM_PROMPTS_DIR, "custom_prompts.json")
@@ -231,7 +231,7 @@ class GPTImage2PromptSelector:
 # Node: GPT Image 2 Prompt Updater
 # ============================================================
 class GPTImage2PromptUpdater:
-    """Update prompts by re-parsing the README or pulling from GitHub."""
+    """Update prompts by downloading latest data from GitHub and opennana.com."""
 
     CATEGORY = "GPT Image 2 Prompts"
     FUNCTION = "update_prompts"
@@ -243,8 +243,7 @@ class GPTImage2PromptUpdater:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "rebuild_from_readme": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
-                "git_pull_first": ("BOOLEAN", {"default": False, "label_on": "Yes", "label_off": "No"}),
+                "sync_github": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
                 "sync_opennana": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
@@ -254,7 +253,7 @@ class GPTImage2PromptUpdater:
     def IS_CHANGED(cls, **kwargs):
         return float("nan")
 
-    def update_prompts(self, rebuild_from_readme, git_pull_first, sync_opennana=True, seed=0):
+    def update_prompts(self, sync_github=True, sync_opennana=True, seed=0):
         import subprocess
         import sys
 
@@ -265,51 +264,26 @@ class GPTImage2PromptUpdater:
         old_count = len(old_presets)
         old_with_text = sum(1 for p in old_presets if p.get("text", "").strip())
 
-        # Optionally git pull the repo first
-        if git_pull_first:
-            # Find git working directory (NODE_DIR or REPO_ROOT)
-            git_cwd = None
-            for candidate in [NODE_DIR, REPO_ROOT]:
-                git_dir = os.path.join(candidate, ".git")
-                if os.path.isdir(git_dir) or os.path.isfile(git_dir):
-                    git_cwd = candidate
-                    break
-            if not git_cwd:
-                status_parts.append("Git pull skipped: no git repository found")
-            else:
-                try:
-                    result = subprocess.run(
-                        ["git", "pull"],
-                        cwd=git_cwd,
-                        capture_output=True, text=True, timeout=60
-                    )
-                    if result.returncode == 0:
-                        status_parts.append(f"Git pull: {result.stdout.strip()}")
-                    else:
-                        status_parts.append(f"Git pull failed: {result.stderr.strip()}")
-                except Exception as e:
-                    status_parts.append(f"Git pull error: {e}")
-
-        # Rebuild local_prompts.json from all READMEs + images/ scan + git history
-        if rebuild_from_readme:
+        # Sync from GitHub: download latest README + incremental images
+        if sync_github:
             try:
                 build_script = os.path.join(NODE_DIR, "build_local_prompts.py")
                 result = subprocess.run(
                     [sys.executable, build_script],
-                    capture_output=True, text=True, timeout=300
+                    capture_output=True, text=True, timeout=600
                 )
                 if result.returncode == 0:
                     # Extract key lines from output
                     lines = result.stdout.strip().split("\n")
                     summary_lines = [l for l in lines if "total" in l.lower() or "stage" in l.lower()
-                                     or "recovered" in l.lower() or "skipping" in l.lower()
+                                     or "download" in l.lower() or "copied" in l.lower()
                                      or "===" in l]
                     output = "\n".join(summary_lines[-10:]) if summary_lines else result.stdout.strip()[-500:]
-                    status_parts.append(f"Rebuild: {output}")
+                    status_parts.append(f"GitHub sync: {output}")
                 else:
-                    status_parts.append(f"Rebuild failed: {result.stderr.strip()[:500]}")
+                    status_parts.append(f"GitHub sync failed: {result.stderr.strip()[:500]}")
             except Exception as e:
-                status_parts.append(f"Rebuild error: {e}")
+                status_parts.append(f"GitHub sync error: {e}")
 
         # Sync from opennana.com (incremental, after rebuild)
         if sync_opennana:

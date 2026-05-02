@@ -901,3 +901,138 @@ const mo = new MutationObserver(() => {
 15. **下拉悬停预览**：MutationObserver + 事件委托 + API 缓存是 LiteGraph combo widget 增强的标准模式
 16. **pointer-events: none**：浮动预览面板必须设置此属性，否则会拦截鼠标事件导致无法选择下拉项
 17. **增量同步**：`sync_from_opennana()` 先加载已有 ID 集合，快速跳过已存在条目，只抓取新增内容
+18. **README 检测窗口**：`_is_case_readme()` 不能只读前 N 字符，仓库 README 可能有大量 badge/News 在前面，Cases 在数百行之后，必须读完整文件用正则匹配
+19. **rebuild 保留第三方数据**：`build_local_prompts.py` 保存时必须合并已有的 `opennana_*` 条目，否则每次 rebuild 会丢失第三方数据源内容
+20. **ComfyUI 节点缓存**：输入不变时 ComfyUI 会跳过执行，Updater 类节点必须同时添加 `seed` INT 输入 + `IS_CHANGED` 返回 `float("nan")` 双保险
+21. **GitHub 下载回退层级**：本地找到 README 但解析出 0 cases 时，仍需触发 GitHub 下载回退（不能仅在"找不到文件"时才触发）
+
+---
+
+## 十二、Updater 节点三大修复（README 检测 / 数据合并 / 强制执行）
+
+### 12.1 问题现象
+
+```
+Updater 节点输出：
+  Rebuild: [Stage 1] Parsing 1 README files...
+    README total: 0 cases
+  ...
+  Total entries: 0
+  OpenNana sync: 102 pages checked, 102 already exist
+  No changes detected (already up to date).
+```
+
+三个独立问题：
+1. README 解析找到文件但提取 0 cases
+2. 同时勾选 rebuild + sync_opennana 时 opennana 数据可能被覆盖
+3. ComfyUI 缓存机制导致输入不变时跳过执行
+
+### 12.2 坑 13：`_is_case_readme()` 只读 5000 字符导致误判
+
+**现象**：解析了 1 个 README 但提取 0 个 Case。
+
+**根因**：仓库 README 顶部有大量 badge、语言切换链接和 News 记录，`### Case 1:` 出现在第 366 行（远超 5000 字符）。而 `_is_case_readme` 只检查前 5000 字符：
+
+```python
+# 旧代码 — BUG
+head = f.read(5000)
+return "### Case" in head or "## " in head and "Portrait" in head
+```
+
+问题叠加：node 自己的 README.md（无 cases）因含 `## ` 和 `Portrait` 被误匹配为 True，导致：
+- `readme_files = [NODE_DIR/README.md]`（错误文件）
+- 已找到 1 个文件，不触发 GitHub 下载回退
+- 解析该文件得到 0 cases
+
+**修复**：
+
+```python
+# 新代码
+def _is_case_readme(filepath):
+    with open(str(filepath), "r", encoding="utf-8") as f:
+        content = f.read()  # 读取完整文件
+    # 用正则精确匹配，不会被 ## + Portrait 误判
+    return bool(re.search(r'###\s*Case\s+\d+:', content))
+```
+
+同时新增**二次回退**：即使找到了 README 文件，解析出 0 cases 时也自动从 GitHub 下载：
+
+```python
+readme_count = len(all_cases)
+if readme_count == 0 and not readme_contents:
+    print("  No cases parsed locally, trying GitHub download as fallback...")
+    for rname in ["README.md", "README_zh-CN.md", "README_de.md"]:
+        content = _download_readme_from_github(rname)
+        if content:
+            cases = parse_single_readme(content, existing_image_paths)
+            if cases:
+                all_cases.extend(cases)
+                break
+```
+
+### 12.3 坑 14：rebuild 覆盖 opennana 数据
+
+**现象**：rebuild 成功后 opennana 条目消失，需要再次单独执行 sync_opennana。
+
+**根因**：`build_local_prompts.py` 的保存逻辑只写 `all_cases`（README 解析 + images 扫描），不包含 `opennana_*` 条目：
+
+```python
+# 旧代码 — 会丢失 opennana 数据
+with open(OUTPUT_JSON, "w") as f:
+    json.dump(all_cases, f)  # all_cases 不含 opennana_*
+```
+
+**修复**：保存前从已有数据中提取并合并 opennana 条目：
+
+```python
+# 新代码 — 保留 opennana 条目
+existing_opennana = [p for p in existing_presets if p.get("id", "").startswith("opennana_")]
+new_ids = {c["id"] for c in all_cases}
+merged_opennana = [p for p in existing_opennana if p["id"] not in new_ids]
+if merged_opennana:
+    print(f"[Merge] Preserving {len(merged_opennana)} opennana entries")
+    all_cases.extend(merged_opennana)
+```
+
+安全检查也需排除 opennana 条目的计数：
+
+```python
+old_preset_count = len([p for p in existing_presets
+                       if not p.get("id", "").startswith("custom_")
+                       and not p.get("id", "").startswith("opennana_")])
+```
+
+### 12.4 坑 15：ComfyUI 缓存跳过 Updater 执行
+
+**现象**：第一次执行 Updater 正常，之后即使仓库有更新，节点不再执行（被 ComfyUI 缓存跳过）。
+
+**根因**：ComfyUI 判断节点输入没有变化时，认为输出也不会变，直接跳过执行。`IS_CHANGED` 默认不存在时，ComfyUI 用输入值的 hash 决定是否缓存。
+
+**修复**：双保险策略
+
+```python
+class GPTImage2PromptUpdater:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                # ... 其他输入 ...
+                # seed 让前端 randomize 每次生成不同值
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+            },
+        }
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        # 返回 NaN 告诉 ComfyUI "永远认为已改变"
+        return float("nan")
+
+    def update_prompts(self, rebuild_from_readme, git_pull_first,
+                       sync_opennana=True, seed=0):  # seed 不参与逻辑
+        ...
+```
+
+**关键点**：
+- `seed` 参数前端配合 ComfyUI 的 "Randomize" 控件，每次队列自动变化
+- `IS_CHANGED` 返回 `float("nan")` 是 ComfyUI 官方约定的"始终重新执行"信号
+- 两者搭配确保无论何种情况都不会被缓存跳过
