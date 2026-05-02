@@ -1,6 +1,6 @@
 # ComfyUI 自定义节点开发技能手册 — GPT Image 2 Prompt 项目全流程
 
-> 基于 [awesome-gpt-image-2-prompts](https://github.com/EvoLinkAI/awesome-gpt-image-2-prompts) 仓库构建的 ComfyUI 自定义节点完整开发记录。
+> 基于 [awesome-gpt-image-2-API-and-Prompts](https://github.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts) 仓库构建的 ComfyUI 自定义节点完整开发记录。
 > 涵盖：架构设计、5 个节点实现、前端 JS 扩展、API 路由、数据构建脚本，以及实际踩坑与解决方案。
 
 ---
@@ -39,9 +39,9 @@ comfyui-gpt-image2-prompt/          ← NODE_DIR（节点根目录）
 |------|------|
 | **完全自包含** | 节点运行时不依赖仓库根目录，所有资源在 `NODE_DIR/data/` 内 |
 | **本地图片** | 禁止运行时在线加载图片，全部从本地文件系统提供 |
-| **三层数据获取** | README 解析 → images/ 目录扫描 → git 历史恢复，确保覆盖最大化 |
+| **纯远程增量获取** | GitHub raw 下载 README + GitHub API 列目录 + 增量下载图片，不依赖 git |
 | **多数据源同步** | GitHub 仓库 + opennana.com sitemap，增量同步互不干扰 |
-| **安全覆写保护** | rebuild 结果为 0 或大幅减少时拒绝覆盖已有数据 |
+| **增量合并保护** | 只做加法——已有条目不覆盖不删除，新条目追加，空文本用已有文本补全 |
 | **热刷新** | 保存新模板后无需重启 ComfyUI 即可在 Selector/Preview 节点看到 |
 
 ### 1.3 五个节点功能
@@ -50,7 +50,7 @@ comfyui-gpt-image2-prompt/          ← NODE_DIR（节点根目录）
 |------|------|--------|
 | **Prompt Selector** 🎨 | 选择预设提示词 + 分类筛选 + 本地预览图 + 可编辑输出 | `OUTPUT_NODE = True`，返回 `{"ui": ..., "result": ...}` |
 | **Prompt Preview** 🖼️ | 纯预览节点，显示提示词文本 + 图片 | 前端实时预览（combo callback + polling） |
-| **Prompt Updater** 🔄 | GitHub pull + 重建 + OpenNana 同步 | 三步顺序执行，sync_opennana 默认开启 |
+| **Prompt Updater** 🔄 | GitHub 远程下载 + 增量合并 + OpenNana 同步 | 不依赖 git，纯 HTTP 增量更新 |
 | **Custom Prompt Saver** 💾 | 保存用户自定义提示词 + 预览图 | 支持重名覆盖、IMAGE tensor → JPEG 转换 |
 | **Execution Checker** ✅ | 健康检查（数据完整性 / 网络可达性） | 返回 `(STRING, BOOLEAN)` 双输出 |
 
@@ -318,11 +318,12 @@ if not abs_path.startswith(node_norm):
 ### 5.1 四阶段流水线
 
 ```
-Stage 1: 解析 README 文件 → 提取 Case (标题/作者/提示词/图片路径)
-          ↓ 本地没有 case README → 自动从 GitHub 下载
-Stage 2: 扫描 images/ 目录 → 补充 README 未覆盖的图片文件夹
-Stage 3: 从 git 历史恢复 → 为空提示词的 case 搜索历史版本中的文本
-Stage 4: 复制图片 → 从源目录复制到 data/images/ 实现自包含
+Stage 1: 从 GitHub raw 下载最新 README + 解析本地 README (取并集)
+          ↓ 两个源取并集，确保数据最大化
+Stage 2: 发现新图片文件夹 → 本地有 images/ 则扫描，没有则调 GitHub API 列目录
+Stage 3: 从 git 历史恢复 → 为空提示词的 case 搜索历史版本中的文本（可选）
+增量合并: 已有条目保留不动，只添加新条目，GitHub 新文本覆盖旧空文本
+Stage 4: 增量下载图片 → 本地 data/images/ 已有的跳过，没有的从 GitHub raw 下载
      ↓
   保存 local_prompts.json
 ```
@@ -456,24 +457,22 @@ return {
 
 ---
 
-### 坑 6：`SRC_IMAGES_DIR` 指向错误目录
+### 坑 6：`SRC_IMAGES_DIR` 指向错误目录（已彻底解决）
 
-**现象**：`build_local_prompts.py` 中 `REPO_ROOT / "images"` 在用户安装环境下指向 `custom_nodes/images/`（不存在），而不是 `comfyui-gpt-image2-prompt/images/`。
+**现象**：`build_local_prompts.py` 中 `REPO_ROOT / "images"` 在用户安装环境下指向错误路径。
 
-**根因**：
-- 开发环境：`NODE_DIR` 是 repo 子目录，`REPO_ROOT` 是仓库根目录（有 images/）
-- 用户环境：`NODE_DIR` 直接在 `custom_nodes/` 下，`REPO_ROOT` 就是 `custom_nodes/`
-
-**解决**：优先检查 `NODE_DIR/images/` 是否存在，不存在再回退到 `REPO_ROOT/images/`：
+**最终方案**：完全移除 `REPO_ROOT` 引用。节点严禁访问上级目录：
 
 ```python
-_SRC_IN_NODE = str(NODE_DIR / "images")
-_SRC_IN_REPO = str(REPO_ROOT / "images")
-if os.path.isdir(_SRC_IN_NODE):
-    SRC_IMAGES_DIR = _SRC_IN_NODE
-elif os.path.isdir(_SRC_IN_REPO):
-    SRC_IMAGES_DIR = _SRC_IN_REPO
+# 只使用 NODE_DIR 内的路径
+SRC_IMAGES_DIR = str(NODE_DIR / "images")  # 可能不存在（用户纯下载安装时）
+LOCAL_IMAGES_DIR = str(NODE_DIR / "data" / "images")  # 实际存储位置
+
+# 当 SRC_IMAGES_DIR 不存在时，Stage 2 改用 GitHub API 列目录
+# Stage 4 改用 GitHub raw 下载图片
 ```
+
+**教训**：不要用 `..` 路径或 `parent` 引用，在用户环境下你永远不知道上级目录是什么。
 
 ---
 
@@ -560,22 +559,25 @@ else:
 
 ---
 
-### 坑 12：git pull 的 cwd 在用户环境下不正确
+### 坑 12：git pull 在用户环境下不可用（已彻底移除）
 
 **现象**：Updater 执行 git pull 时报找不到 git 仓库。
 
-**根因**：`cwd=REPO_ROOT` 在用户环境下指向 `custom_nodes/`（不是 git repo）。
+**根因**：用户通过 ComfyUI Manager 安装、手动复制等方式安装节点时，目录内没有 `.git`。
 
-**解决**：自动检测哪个目录有 `.git`：
+**最终方案**：完全移除 git 依赖，改用纯 HTTP 方式更新：
 
 ```python
-git_cwd = None
-for candidate in [NODE_DIR, REPO_ROOT]:
-    git_dir = os.path.join(candidate, ".git")
-    if os.path.isdir(git_dir) or os.path.isfile(git_dir):
-        git_cwd = candidate
-        break
+# 旧方案（已废弃）
+subprocess.run(["git", "pull"], cwd=...)
+
+# 新方案：直接从 GitHub 下载
+# 1. README: raw.githubusercontent.com/EvoLinkAI/.../main/README.md
+# 2. 目录列表: api.github.com/repos/EvoLinkAI/.../contents/images
+# 3. 图片: raw.githubusercontent.com/EvoLinkAI/.../main/images/xxx/output.jpg
 ```
+
+**教训**：ComfyUI 节点不能假设用户有 git 环境或以 git clone 方式安装。
 
 ---
 
@@ -689,10 +691,9 @@ return web.FileResponse(file_path, headers={"Content-Type": "image/jpeg"})
 
 ```
 Updater 执行顺序：
-  1. git pull（可选）
-  2. rebuild_from_readme（重建本地 JSON）
-  3. sync_opennana（检查 opennana.com 新模板）  ← 新增
-  4. 统计汇总
+  1. sync_github（从 GitHub 下载最新 README + 增量图片）
+  2. sync_opennana（检查 opennana.com 新模板）
+  3. 统计汇总
 ```
 
 ### 9.2 核心函数
@@ -766,14 +767,17 @@ entry_id = f"opennana_{slug.replace('-', '_')}"
 ### 9.7 Updater 节点集成
 
 ```python
-# nodes.py - INPUT_TYPES 新增选项
+# nodes.py - INPUT_TYPES
+"sync_github": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
 "sync_opennana": ("BOOLEAN", {"default": True, "label_on": "Yes", "label_off": "No"}),
+"seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
 
 # update_prompts() 中调用
+if sync_github:
+    # 运行 build_local_prompts.py → 下载 README + 增量图片 + 合并
 if sync_opennana:
     from fetch_opennana import sync_from_opennana
     result = sync_from_opennana(targets=None, dry_run=False, delay=1.0)
-    status_parts.append(result["message"])
 ```
 
 注意 import 容错：先尝试直接 `from fetch_opennana import`，失败则用 `importlib.util.spec_from_file_location` 按绝对路径加载。
@@ -902,13 +906,17 @@ const mo = new MutationObserver(() => {
 16. **pointer-events: none**：浮动预览面板必须设置此属性，否则会拦截鼠标事件导致无法选择下拉项
 17. **增量同步**：`sync_from_opennana()` 先加载已有 ID 集合，快速跳过已存在条目，只抓取新增内容
 18. **README 检测窗口**：`_is_case_readme()` 不能只读前 N 字符，仓库 README 可能有大量 badge/News 在前面，Cases 在数百行之后，必须读完整文件用正则匹配
-19. **rebuild 保留第三方数据**：`build_local_prompts.py` 保存时必须合并已有的 `opennana_*` 条目，否则每次 rebuild 会丢失第三方数据源内容
+19. **增量合并保护第三方数据**：`build_local_prompts.py` 合并时保留所有已有 `opennana_*` 条目，不会被 GitHub 合并覆盖
 20. **ComfyUI 节点缓存**：输入不变时 ComfyUI 会跳过执行，Updater 类节点必须同时添加 `seed` INT 输入 + `IS_CHANGED` 返回 `float("nan")` 双保险
-21. **GitHub 下载回退层级**：本地找到 README 但解析出 0 cases 时，仍需触发 GitHub 下载回退（不能仅在"找不到文件"时才触发）
+21. **GitHub 下载回退层级**：本地找到 README 但解析出 0 cases 时，仍需触发 GitHub 下载回退
+22. **不依赖 git**：ComfyUI 节点不能假设用户有 git 或以 git clone 方式安装，纯 HTTP 下载 + API 是更安全的选择
+23. **解析与下载职责分离**：解析阶段不应检查图片是否本地存在，否则新 case 永远无法被发现
+24. **MD5 去重陋习**：内容相同不等于逻辑重复，去重应基于业务 ID（文件夹名）而非文件哈希
+25. **路径作用域强制约束**：严禁任何 `..` 或 `parent` 引用，所有路径必须在 NODE_DIR 之下
 
 ---
 
-## 十二、Updater 节点三大修复（README 检测 / 数据合并 / 强制执行）
+## 十二、Updater 节点核心修复（README 检测 / 增量合并 / 强制执行）
 
 ### 12.1 问题现象
 
@@ -970,37 +978,42 @@ if readme_count == 0 and not readme_contents:
                 break
 ```
 
-### 12.3 坑 14：rebuild 覆盖 opennana 数据
+### 12.3 坑 14：增量合并策略
 
-**现象**：rebuild 成功后 opennana 条目消失，需要再次单独执行 sync_opennana。
+**现象**：从 GitHub 下载的 README 只有 18 个 case，本地已有 300+ 条有提示词的条目。如果直接重建会丢失已有数据。
 
-**根因**：`build_local_prompts.py` 的保存逻辑只写 `all_cases`（README 解析 + images 扫描），不包含 `opennana_*` 条目：
+**根因**：GitHub 上的 README 可能比本地已有数据少（未推送、不同版本等），直接用新结果覆盖会丢失已有提示词文本。
 
-```python
-# 旧代码 — 会丢失 opennana 数据
-with open(OUTPUT_JSON, "w") as f:
-    json.dump(all_cases, f)  # all_cases 不含 opennana_*
-```
-
-**修复**：保存前从已有数据中提取并合并 opennana 条目：
+**解决**：采用真正的增量合并策略（只做加法）：
 
 ```python
-# 新代码 — 保留 opennana 条目
-existing_opennana = [p for p in existing_presets if p.get("id", "").startswith("opennana_")]
-new_ids = {c["id"] for c in all_cases}
-merged_opennana = [p for p in existing_opennana if p["id"] not in new_ids]
-if merged_opennana:
-    print(f"[Merge] Preserving {len(merged_opennana)} opennana entries")
-    all_cases.extend(merged_opennana)
+# 增量合并核心逻辑
+existing_by_id = {p["id"]: p for p in existing_presets}
+final_entries = []
+
+for c in all_cases:
+    old_entry = existing_by_id.get(c["id"])
+    if old_entry:
+        # 已存在：保留旧条目，只在 GitHub 有新文本且旧条目为空时更新
+        merged = dict(old_entry)
+        if c.get("text", "").strip() and not old_entry.get("text", "").strip():
+            merged["text"] = c["text"]
+        final_entries.append(merged)
+    else:
+        # 新条目：追加
+        final_entries.append(c)
+
+# 保留未被新扫描覆盖的已有条目（包括 opennana_*）
+for p in existing_presets:
+    if p["id"] not in processed_ids:
+        final_entries.append(p)
 ```
 
-安全检查也需排除 opennana 条目的计数：
-
-```python
-old_preset_count = len([p for p in existing_presets
-                       if not p.get("id", "").startswith("custom_")
-                       and not p.get("id", "").startswith("opennana_")])
-```
+**关键点**：
+- 已有条目永不删除
+- 已有提示词文本永不被空文本覆盖
+- GitHub 新文本可以填充本地空文本
+- opennana_* 条目自动保留（作为 existing 的一部分）
 
 ### 12.4 坑 15：ComfyUI 缓存跳过 Updater 执行
 
@@ -1027,7 +1040,7 @@ class GPTImage2PromptUpdater:
         # 返回 NaN 告诉 ComfyUI "永远认为已改变"
         return float("nan")
 
-    def update_prompts(self, rebuild_from_readme, git_pull_first,
+    def update_prompts(self, sync_github=True,
                        sync_opennana=True, seed=0):  # seed 不参与逻辑
         ...
 ```
@@ -1036,3 +1049,34 @@ class GPTImage2PromptUpdater:
 - `seed` 参数前端配合 ComfyUI 的 "Randomize" 控件，每次队列自动变化
 - `IS_CHANGED` 返回 `float("nan")` 是 ComfyUI 官方约定的"始终重新执行"信号
 - 两者搭配确保无论何种情况都不会被缓存跳过
+
+---
+
+## 十三、坑 16：MD5 去重误删新增 case
+
+**现象**：仓库新增了 13 个图片文件夹，但 `scan_images_directory` 找不到它们，Updater 报告"无新增"。
+
+**根因**：`_build_md5_map()` 对比 `output.jpg` 的 MD5，如果新文件夹的图片和已覆盖文件夹的相同，就跳过。但这在以下场景是错误的：
+- **comparison 类型**：同一张图用不同 prompt 对比效果，图片本就一样
+- **跨类别复用**：如 `poster_case17` 和 `character_case7` 共享图片但属于不同 case
+
+**解决**：移除 MD5 去重逻辑。每个唯一文件夹都应生成独立条目（已通过文件夹名作为唯一 ID，不会真正重复）。
+
+**教训**：内容相同不等于逻辑重复。去重应基于业务 ID，不应基于文件内容哈希。
+
+---
+
+## 十四、坑 17：下载的 README 解析结果过少
+
+**现象**：本地 README 有 290 个 case，从 GitHub 下载的 README 只解析出 14 个。
+
+**根因（多层）**：
+1. GitHub main 分支的 README 可能比本地少（未推送）
+2. `_check_image_exists()` 门控过严：对于新 case，图片还未下载到本地，该检查直接返回 False 导致 case 被过滤
+
+**解决**：
+1. 同时解析 GitHub README 和本地 README，取并集
+2. 移除 `_check_image_exists` 门控——先接受所有 case，图片在 Stage 4 下载
+3. 增量合并确保已有数据不丢失
+
+**教训**：解析阶段不应做“图片是否存在”检查，那是下载阶段的事。解析和下载职责分离。

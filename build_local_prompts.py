@@ -19,7 +19,7 @@ LOCAL_IMAGES_DIR = str(NODE_DIR / "data" / "images")  # Destination inside node 
 OUTPUT_JSON = str(NODE_DIR / "data" / "local_prompts.json")
 
 # GitHub raw base URL for downloading README files
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com/EvoLinkAI/awesome-gpt-image-2-prompts/main"
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts/main"
 
 # Section keyword mapping (works across languages)
 SECTION_KEYWORDS = {
@@ -210,7 +210,7 @@ def _build_md5_map():
 def _list_github_image_folders():
     """List image folders from GitHub API (when local images/ doesn't exist)."""
     import urllib.request
-    url = "https://api.github.com/repos/EvoLinkAI/awesome-gpt-image-2-prompts/contents/images"
+    url = "https://api.github.com/repos/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts/contents/images"
     try:
         req = urllib.request.Request(url, headers={
             "User-Agent": "ComfyUI-GPTImage2Prompt/1.0",

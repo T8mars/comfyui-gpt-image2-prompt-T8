@@ -1,6 +1,6 @@
 """
 ComfyUI GPT Image 2 Prompt Nodes
-Based on: https://github.com/EvoLinkAI/awesome-gpt-image-2-prompts
+Based on: https://github.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts
 All thumbnails are served from local files - no online URL fetching.
 """
 
@@ -30,7 +30,7 @@ CUSTOM_PROMPTS_DIR = os.path.join(DATA_DIR, "custom_prompts")
 CUSTOM_PROMPTS_JSON = os.path.join(CUSTOM_PROMPTS_DIR, "custom_prompts.json")
 UPDATE_STATE_FILE = os.path.join(DATA_DIR, "update_state.json")
 
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com/EvoLinkAI/awesome-gpt-image-2-prompts/main"
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts/main"
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(CUSTOM_PROMPTS_DIR, exist_ok=True)
