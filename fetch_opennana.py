@@ -23,9 +23,13 @@ import os
 import re
 import sys
 import time
-import urllib.request
 import urllib.error
 from pathlib import Path
+
+try:
+    from .http_retry import read_url_with_retry
+except ImportError:
+    from http_retry import read_url_with_retry
 
 # ---------------------------------------------------------------------------
 # Paths (all str, no pathlib at runtime — Windows compatibility)
@@ -108,10 +112,12 @@ SLUG_CATEGORY_RULES = [
 
 def _fetch_page(url):
     """Fetch HTML content from a URL."""
-    req = urllib.request.Request(url, headers=HEADERS)
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return resp.read().decode("utf-8")
+        return read_url_with_retry(
+            url,
+            headers=HEADERS,
+            timeout=30,
+        ).decode("utf-8")
     except urllib.error.HTTPError as e:
         print(f"  [ERROR] HTTP {e.code} fetching {url}")
         return None
@@ -122,10 +128,8 @@ def _fetch_page(url):
 
 def _download_image(url, save_path):
     """Download an image to local path."""
-    req = urllib.request.Request(url, headers=HEADERS)
     try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            data = resp.read()
+        data = read_url_with_retry(url, headers=HEADERS, timeout=60)
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         with open(save_path, "wb") as f:
             f.write(data)

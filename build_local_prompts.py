@@ -9,6 +9,11 @@ import json
 import shutil
 from pathlib import Path
 
+try:
+    from .http_retry import read_url_with_retry
+except ImportError:
+    from http_retry import read_url_with_retry
+
 NODE_DIR = Path(__file__).resolve().parent            # comfyui-gpt-image2-prompt/
 
 # Source images: NODE_DIR/images/ (self-contained install)
@@ -209,16 +214,18 @@ def _build_md5_map():
 
 def _list_github_image_folders():
     """List image folders from GitHub API (when local images/ doesn't exist)."""
-    import urllib.request
     url = "https://api.github.com/repos/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts/contents/images"
     try:
-        req = urllib.request.Request(url, headers={
-            "User-Agent": "ComfyUI-GPTImage2Prompt/1.0",
-            "Accept": "application/vnd.github.v3+json",
-        })
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            import json as _json
-            items = _json.loads(resp.read().decode("utf-8"))
+        payload = read_url_with_retry(
+            url,
+            headers={
+                "User-Agent": "ComfyUI-GPTImage2Prompt/1.0",
+                "Accept": "application/vnd.github.v3+json",
+            },
+            timeout=30,
+        )
+        import json as _json
+        items = _json.loads(payload.decode("utf-8"))
         folders = [item["name"] for item in items if item["type"] == "dir"]
         return folders
     except Exception as e:
@@ -444,13 +451,15 @@ def _recover_from_git_history(empty_cases):
 
 def _download_readme_from_github(filename="README.md"):
     """Download a README file from GitHub. Returns content string or None."""
-    import urllib.request
     url = f"{GITHUB_RAW_BASE}/{filename}"
     try:
         print(f"  Downloading {url} ...")
-        req = urllib.request.Request(url, headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            content = resp.read().decode("utf-8")
+        payload = read_url_with_retry(
+            url,
+            headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"},
+            timeout=30,
+        )
+        content = payload.decode("utf-8")
         if "### Case" in content:
             return content
         print(f"  Downloaded but no cases found in {filename}")
@@ -478,12 +487,13 @@ def _download_image_from_github(image_rel_path, dst_path):
     dst_path: absolute path to save the image
     Returns True on success.
     """
-    import urllib.request
     url = f"{GITHUB_RAW_BASE}/{image_rel_path}"
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = resp.read()
+        data = read_url_with_retry(
+            url,
+            headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"},
+            timeout=30,
+        )
         if len(data) < 100:  # Too small, probably an error page
             return False
         os.makedirs(os.path.dirname(dst_path), exist_ok=True)
