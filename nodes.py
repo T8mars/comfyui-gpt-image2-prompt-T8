@@ -8,14 +8,16 @@ import os
 import json
 import time
 import hashlib
-import shutil
-import urllib.request
-import urllib.error
 import threading
 from datetime import datetime
 from pathlib import Path
 
 import folder_paths
+
+try:
+    from .http_retry import read_url_with_retry
+except ImportError:
+    from http_retry import read_url_with_retry
 
 # ============================================================
 # Paths  (all resolved within NODE_DIR - fully self-contained)
@@ -62,10 +64,13 @@ def _url_to_filename(url: str) -> str:
 
 def _download_file(url: str, dest: str, timeout: int = 30) -> bool:
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"})
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            with open(dest, "wb") as f:
-                shutil.copyfileobj(resp, f)
+        data = read_url_with_retry(
+            url,
+            headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"},
+            timeout=timeout,
+        )
+        with open(dest, "wb") as f:
+            f.write(data)
         return True
     except Exception as e:
         print(f"[GPTImage2Prompt] Download failed {url}: {e}")
@@ -514,10 +519,14 @@ class GPTImage2ExecutionChecker:
         if check_network:
             try:
                 test_url = f"{GITHUB_RAW_BASE}/README.md"
-                req = urllib.request.Request(test_url, method="HEAD",
-                                            headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"})
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    report_lines.append(f"[OK] GitHub accessible (HTTP {resp.status}).")
+                status = read_url_with_retry(
+                    test_url,
+                    method="HEAD",
+                    headers={"User-Agent": "ComfyUI-GPTImage2Prompt/1.0"},
+                    timeout=10,
+                    consume=lambda response: response.status,
+                )
+                report_lines.append(f"[OK] GitHub accessible (HTTP {status}).")
             except Exception as e:
                 report_lines.append(f"[WARN] GitHub not accessible: {e}")
                 healthy = False
